@@ -125,6 +125,30 @@ body{padding:0 clamp(8px,1.1vw,22px) 70px}
 @media(min-width:1800px){.tab.on.gauto{grid-template-columns:repeat(auto-fill,minmax(440px,1fr))}#chcard .ch{height:270px}}
 @media(max-width:899px){.gauto>.wide{grid-column:1/-1}}
 @media(max-width:719px){.tab.on.g12,.tab.on.gauto{display:block}.tab.on>.card,.tab.on>.panel{margin:8px 0}nav button{font-size:11px;padding:12px 0}.pgseg{order:9;flex:1 1 100%}.pgseg button{flex:1}.big{font-size:26px}.kv4{grid-template-columns:repeat(2,1fr)}.gl2{grid-template-columns:1fr}#chcard .ch{height:170px}.mt{font-size:11px}.mt td,.mt th{white-space:normal;padding:3px 2px}.card,.panel{min-width:0;overflow-x:auto}.pill{padding:0 4px}}
+/* ===== v22: 탭별 디자인 정리 ===== */
+td,th{word-break:keep-all;overflow-wrap:anywhere}
+.kv4 b{white-space:normal;overflow:visible}
+.tab.on#tab-watch,.tab.on#tab-recs,.tab.on#tab-settings{display:block}
+#tab-watch>.card,#tab-settings>.card{margin:0 0 10px}
+#tab-watch>.card:first-child{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+#tab-watch>.card:first-child h3{margin:0}
+#tab-watch #wq{flex:1 1 240px;width:auto!important;max-width:420px}
+#tab-watch #wmsg:empty{display:none}#tab-watch #whint{flex:1 1 100%;font-size:12px}
+#wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(380px,100%),1fr));gap:10px;align-items:stretch}
+#wlist>.card{margin:0;min-width:0}#wlist .wi{align-items:flex-start}#wlist .wi>div{min-width:0}#wlist .wi canvas{width:130px;height:52px}
+#wlist .news{font-size:12px;padding:5px 0;border-top:1px solid var(--line);margin-top:5px}
+#recs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(460px,100%),1fr));gap:10px;align-items:stretch}
+#recs>.card{margin:0;min-width:0}#recs table{font-size:12.5px;margin-top:6px}#recs td,#recs th{padding:5px 6px;white-space:nowrap}
+#tab-recs>.mut{padding:0 2px 8px!important;font-size:12px}
+#setform{grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr))!important;gap:6px 24px}
+#tab-settings .row{max-width:620px}
+.tab.on.gauto{align-items:stretch}
+.rlpanel.wide{grid-column:span 2}
+#evlog,#nev,#styledesc{max-height:78vh;overflow:auto}
+#nlist,#impbox2{max-height:82vh;overflow:auto}
+#evlog>div,#nev>div{padding:2px 0;border-bottom:1px dashed rgba(127,140,170,.15)}
+@media(max-width:899px){.rlpanel.wide{grid-column:1/-1}}
+@media(max-width:719px){#evlog,#nev,#styledesc,#nlist,#impbox2{max-height:none}#recs td,#recs th{padding:4px 3px}#wlist .wi canvas{width:96px;height:40px}}
 </style></head><body>
 <div class="top"><div class="brandbar"><div class="logo">◢ JEV<span>//</span>TERMINAL</div><span id="modebadge" class="mode live">● 실전 LIVE</span>
 <div class="seg pgseg"><button id="pg-coin" class="on">코인 · 실전</button><button id="pg-stock">주식 · 모의</button></div>
