@@ -151,6 +151,11 @@ td,th{word-break:keep-all}
 #evlog>div,#nev>div{padding:2px 0;border-bottom:1px dashed rgba(127,140,170,.15)}
 @media(max-width:899px){.rlpanel.wide,#reconcard,#sigcard{grid-column:1/-1}}
 @media(max-width:719px){#evlog,#nev,#styledesc,#nlist,#impbox2{max-height:none}#recs td,#recs th{padding:4px 3px}#reconcard td,#reconcard th{white-space:normal}#reconcard table{font-size:10.5px}#reconcard td,#reconcard th{padding:3px 2px}#wlist .wi canvas{width:96px;height:40px}}
+#mwcard .kv4{margin-top:4px}
+#mwkimp{grid-template-columns:repeat(5,minmax(0,1fr))}
+#mwcard table.mt tr.flag td{background:rgba(255,176,32,.12)}
+#mwcard #mwbody{margin-top:2px}
+@media(max-width:719px){#mwkimp{grid-template-columns:repeat(2,1fr)}}
 </style></head><body>
 <div class="top"><div class="brandbar"><div class="logo">◢ JEV<span>//</span>TERMINAL</div><span id="modebadge" class="mode live">● 실전 LIVE</span>
 <div class="seg pgseg"><button id="pg-coin" class="on">코인 · 실전</button><button id="pg-stock">주식 · 모의</button></div>
@@ -201,6 +206,10 @@ td,th{word-break:keep-all}
 <div class="card s4" id="impcard"><h3>🔥 중요 뉴스 요약</h3><div id="impbox" class="mut scrollbox">없음</div></div>
 <div class="card s4 coinonly" id="skillcard"><h3>거래 스킬 검증 리포트 <span class="mut" id="skillmeta"></span></h3><div id="skillbody" class="mut">검증 리포트 준비 중입니다. 완료되면 여기에 스타일별 수익률·승률·최대 손실이 표시됩니다.</div></div>
 <div class="card s4 coinonly" id="sccard"><h3>스타일 성적표 <span class="mut" id="scmeta"></span></h3><div id="scbody"></div></div>
+<div class="card s12 coinonly" id="mwcard"><h3>김프·펀딩비 <span class="mut" id="mwmeta"></span></h3>
+<div id="mwkimp" class="kv4"></div>
+<div class="mut" id="mwfund" style="margin:6px 0 4px"></div>
+<div id="mwbody"></div></div>
 </div>
 
 <div id="tab-ana" class="tab gauto">
@@ -463,6 +472,29 @@ if(!confirm((PG=='coin'?'[실전] ':'[모의] ')+'투입금액을 '+f(v)+'원 '+
 toast('처리 중… (최대 30초)');const r=await api('budget',{amount:a,confirm:true});toast(r.ok?(r.msg||'완료'):('거부/실패: '+(r.error||'')),!r.ok);if(r.ok)$('amt').value='';setTimeout(load,1000)}
 $('addbtn').onclick=()=>money(1);$('subbtn').onclick=()=>money(-1);
 document.querySelectorAll('[data-a]').forEach(c=>c.onclick=()=>{$('amt').value=c.dataset.a});
+function renderMw(x){const card=$('mwcard');if(!card)return;const w=(x&&x.market_watch)||{};
+ const meta=$('mwmeta'),box=$('mwkimp'),fund=$('mwfund'),body=$('mwbody');
+ if(!w||!w.t){if(meta)meta.textContent='수집 전';if(box)box.innerHTML='';if(fund)fund.textContent='';if(body)body.innerHTML='<div class="mut">김치 프리미엄·펀딩비 수집을 기다리는 중입니다.</div>';return}
+ const fx=w.fx||{};
+ meta.textContent='갱신 '+(w.t||'-')+' · 관찰 전용(주문 없음) · 업비트 USDT '+(fx.usdt_krw!=null?f(fx.usdt_krw,1)+'원':'-')+(fx.official_krw!=null?(' · 고시환율 '+f(fx.official_krw,2)+'원'+(fx.official_src?' ('+fx.official_src+')':'')):'');
+ const compact=n=>{if(n==null||isNaN(n))return '-';if(Math.abs(n)>=1e8)return f(n/1e8,1)+'억';if(Math.abs(n)>=1e4)return f(n/1e4,0)+'만';return f(n)};
+ const fmtP=v=>v==null?'-':((v>0?'+':'')+f(v,2)+'%');
+ box.innerHTML=(w.kimchi||[]).map(k=>{
+  const main=k.sym==='USDT'?k.prem_fx:k.prem_usdt;
+  const sub=k.sym==='USDT'?('업비트 '+f(k.upbit_krw,1)+'원'):('고시 대비 <span class="'+cl(k.prem_fx)+'">'+fmtP(k.prem_fx)+'</span><br>'+f(k.upbit_krw)+'원 / $'+f(k.binance_usdt,k.binance_usdt>=100?2:4));
+  return '<div><small>'+esc(k.sym)+'</small><b class="'+cl(main)+'">'+fmtP(main)+'</b><span class="mut" style="font-size:11px;display:block;line-height:1.35;margin-top:2px">'+sub+'</span></div>';
+ }).join('')||'';
+ const cands=w.candidates||[];
+ let note=cands.length?('연 15%↑ 캐리 후보(현물 롱·선물 숏, 관찰만): '+cands.map(c=>String(c.sym||'').replace(/USDT$/,'')+' '+fmtP(c.ann)).join(' · ')):'지금 상위 거래량 종목 중 연 15%↑ 펀딩 후보는 없습니다.';
+ if(w.error)note+=' · 일부 오류: '+w.error;
+ fund.textContent=note;
+ const rows=w.funding||[];
+ if(!rows.length){body.innerHTML='<div class="mut">펀딩비 자료를 아직 못 받았습니다.</div>';return}
+ body.innerHTML='<div class="scrollbox" style="overflow-x:auto"><table class="mt"><tr><th>종목</th><th>펀딩비</th><th>연환산</th><th>주기</th><th>다음</th><th>24h 거래대금</th></tr>'+
+  rows.map(r=>{
+   const flag=!!r.flag, rate=r.rate, ann=r.ann;
+   return '<tr class="'+(flag?'flag':'')+'"><td>'+esc(String(r.sym||'').replace(/USDT$/,''))+(flag?' <span class="pill">15%↑</span>':'')+'</td><td class="'+cl(rate)+'">'+(rate==null?'-':((rate>0?'+':'')+f(rate*100,4)+'%'))+'</td><td class="'+cl(ann)+'">'+fmtP(ann)+'</td><td>'+(r.interval_h?f(r.interval_h,0)+'시간':'-')+'</td><td>'+esc(((r.next||'').slice(11,16))||'-')+'</td><td>'+compact(r.volume)+'</td></tr>';
+  }).join('')+'</table></div>'}
 function renderX(){const x=X;if(!x)return;const isC=PG=='coin';
 const items=(x.news&&x.news.items)||[];
 const kinds=isC?['coin','upbit']:['stock'];
@@ -490,7 +522,7 @@ $('recs').innerHTML=isC?cr(R.crypto_short,'코인 단타 후보 (10분 내 0.8%�
  st(R.stock_short,'short','주식 단기 후보 (다음 거래일 1%↑ 확률)','국내 거래량 상위 + 대형주 · 모의 운영의 진입 후보 · 갱신 '+(R.updated_stock||'-'))+st(R.stock_swing,'swing','주식 스윙 후보 (5거래일 내 3%↑ 확률)','국내 거래량 상위 + 대형주 · 갱신 '+(R.updated_stock||'-'));
 const ev=(x.events||[]).filter(e=>(e.p||'coin')==PG||e.k=='watch');
 $('evlog').innerHTML=ev.slice(0,80).map(e=>`<div>${esc(e.t.slice(5,19))} · ${esc(e.m)}</div>`).join('')||'없음';
-$('nev').innerHTML=isC?((x.news_events||[]).map(e=>`<div>${esc(e.time.slice(5,16))} · ${esc(e.kind)} · ${esc(e.market)} · ${esc(e.title)}</div>`).join('')||'아직 없음'):'주식 뉴스는 추천·참고용입니다 (자동 매수 없음)'}
+$('nev').innerHTML=isC?((x.news_events||[]).map(e=>`<div>${esc(e.time.slice(5,16))} · ${esc(e.kind)} · ${esc(e.market)} · ${esc(e.title)}</div>`).join('')||'아직 없음'):'주식 뉴스는 추천·참고용입니다 (자동 매수 없음)';try{renderMw(x)}catch(e){}}
 $('wadd').onclick=async()=>{const q=$('wq').value.trim();if(!q)return;const r=await api('watch/add',{type:PG=='coin'?'coin':'stock',query:q});toast(r.ok?'추가됨: '+r.item.name:('오류: '+r.error),!r.ok);if(r.ok)$('wq').value='';setTimeout(loadX,1500)};
 $('pg-coin').classList.toggle('on',PG=='coin');$('pg-stock').classList.toggle('on',PG=='stock');
 
