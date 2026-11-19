@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>MONEY</title>
+<style>
+:root{--bg:#0b0f17;--card:#141a26;--line:#243047;--tx:#dfe7f5;--mut:#8796b0;--up:#ff5d6c;--dn:#4d9bff;--cy:#19e3d1;--red:#ff4d5e;--hi:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:14px}
+h1{font-size:18px;margin:4px 0 12px;display:flex;justify-content:space-between;align-items:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.mut{color:var(--mut);font-size:13px}.up{color:var(--up)}.dn{color:var(--dn)}
+.big{font-size:28px;font-weight:700;color:var(--hi)}.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+button{background:#1c2436;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:14px;cursor:pointer}
+button.on{border-color:var(--cy);color:var(--cy);background:rgba(25,227,209,.1)}
+button.on.agg{border-color:var(--red);color:#ff9aa5;background:rgba(255,77,94,.12)}
+button:disabled{opacity:.5}button.pri{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+input{background:#0f1420;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:8px;font-size:15px;width:100%}
+.row{display:flex;gap:6px;align-items:center}.row input{flex:1}
+.why{padding:10px;border-radius:8px;background:#101828;border-left:3px solid var(--cy)}.why.bad{border-left-color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:5px 4px;border-bottom:1px solid var(--line);text-align:left}
+.pc{border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:6px}
+details summary{cursor:pointer;font-weight:600}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#222c40;padding:10px 14px;border-radius:8px;display:none;max-width:90%}
+#toast.err{background:#5a1d26}
+.hide{display:none}
+</style></head>
+<body><div class="wrap">
+<h1><span>💰 MONEY</span><span class="mut" id="fresh"></span></h1>
+
+<div id="login" class="card hide">
+ <b>로그인</b><div class="mut" style="margin:6px 0">등록된 이메일로 인증번호를 받아 입력하세요.</div>
+ <div class="row"><input id="em" type="email" placeholder="이메일" autocomplete="email"><button id="send">인증 메일 받기</button></div>
+ <div class="row" style="margin-top:8px"><input id="code" inputmode="numeric" placeholder="인증번호" autocomplete="one-time-code"><button class="pri" id="verify">확인</button></div>
+ <div class="mut" id="lmsg" style="margin-top:6px"></div>
+</div>
+
+<div id="app" class="hide">
+ <div class="card">
+  <div class="kpis">
+   <div><div class="mut">평가금액</div><div class="big" id="eq">-</div><div class="mut" id="eqsub"></div></div>
+   <div><div class="mut">오늘 손익</div><div class="big" id="today">-</div><div class="mut" id="tot"></div></div>
+  </div>
+  <div class="why" id="why" style="margin-top:12px">-</div>
+ </div>
+
+ <div class="card">
+  <div class="mut">매매 스타일</div><div class="btns" id="styles"></div>
+  <div class="mut" style="margin-top:10px">투자 성향 (모든 스타일과 조합)</div>
+  <div class="grid2" style="margin-top:6px"><button data-r="aggressive">🔥 공격적</button><button data-r="stable">🛡 안정적</button></div>
+  <div class="btns" style="margin-top:10px"><button id="pauseBtn"></button></div>
+ </div>
+
+ <div class="card">
+  <div class="mut">투입금액 조정 (원)</div>
+  <div class="row" style="margin-top:6px"><input id="amt" inputmode="numeric" placeholder="예: 100000"><button id="add">추가</button><button id="sub">빼기</button></div>
+  <div class="mut" id="budmeta" style="margin-top:4px"></div>
+ </div>
+
+ <div class="card"><b>보유 코인</b> <span class="mut" id="posmeta"></span><div id="pos"></div></div>
+ <div class="card"><b>최근 거래 5건</b><table id="trades"></table></div>
+
+ <div class="card"><details><summary>상세</summary>
+  <div id="detail" style="margin-top:10px"></div>
+  <div style="margin-top:12px"><b>설정</b>
+   <div class="mut">종료 시각 (YYYY-MM-DD HH:MM) — 봇을 다시 돌리려면 미래 시각으로</div>
+   <div class="row"><input id="endt" placeholder="2026-11-30 15:00"><button id="saveEnd">저장</button></div>
+   <div class="mut" style="margin-top:6px">손실 한도 %</div>
+   <div class="row"><input id="lossp" inputmode="decimal"><button id="saveLoss">저장</button></div>
+  </div>
+  <div style="margin-top:12px"><button id="logout">로그아웃</button></div>
+ </details></div>
+</div>
+<div id="toast"></div>
+</div>
+<script src="supabase.js"></script>
+<script>
+const SB=supabase.createClient("https://ztypllzgjivutzorhayz.supabase.co","sb_publishable_2oRYJ0sJcdPGBr3SK_XH0Q_SuA_yvHX",{auth:{persistSession:true,storageKey:"money-dash-auth",detectSessionInUrl:false}});
+const $=id=>document.getElementById(id);
+const f=(v,d=0)=>v==null||isNaN(v)?'-':Number(v).toLocaleString('ko-KR',{maximumFractionDigits:d,minimumFractionDigits:d});
+const sg=v=>v==null?'-':(v>0?'+':'')+f(v)+'원';const cl=v=>v>0?'up':v<0?'dn':'';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m,err){const t=$('toast');t.textContent=m;t.className=err?'err':'';t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',4500)}
+let D=null,UPD=null,busy=false;
+
+async function cmd(action,params,label){
+ if(busy)return;busy=true;toast(label+' 요청 중…');
+ const {data,error}=await SB.from('dash_cmd').insert({action,params}).select('id').single();
+ if(error){busy=false;return toast('요청 실패: '+error.message,true)}
+ for(let i=0;i<40;i++){await new Promise(r=>setTimeout(r,1500));
+  const {data:r}=await SB.from('dash_cmd').select('status,result').eq('id',data.id).single();
+  if(r&&r.status!=='queued'&&r.status!=='running'){busy=false;const res=r.result||{};
+   if(r.status==='done')toast(label+' 완료'+(res.msg?' — '+res.msg:''));else toast(label+' 실패: '+(res.error||r.status),true);
+   setTimeout(load,1500);setTimeout(load,6000);return}}
+ busy=false;toast('맥 미니 응답 대기 중 — 잠시 후 확인하세요',true)}
+
+function render(){const d=(D&&D.coin)||{},c=d.control||{};const pos=d.positions||[];
+ $('eq').textContent=f(d.equity)+'원';$('eqsub').textContent='현금 '+f(d.cash)+'원 · 운영금 '+f(d.capital)+'원';
+ $('today').innerHTML=`<span class="${cl(d.today_pnl)}">${sg(d.today_pnl)}</span>`;
+ $('tot').innerHTML=`누적 <span class="${cl(d.pnl_krw)}">${sg(d.pnl_krw)} (${d.pnl_pct>0?'+':''}${f(d.pnl_pct,2)}%)</span>`;
+ let t,k='';const N=d.notrade||{},pd=d.pend||[];
+ if(!d.running){t='⏹ 봇 정지됨'+(d.stop_reason?' ('+({'end-time':'종료 시각 지남','kill-switch':'긴급정지','signal':'재시작 중'}[d.stop_reason]||d.stop_reason)+')':'')+' — 다시 돌리려면 상세 > 종료 시각을 미래로';k='bad'}
+ else if(c.paused){t='⏸ 신규 매수 일시정지 중 — 보유분 청산 규칙만 동작';k='bad'}
+ else if(d.halted){t='⛔ '+(d.halted.text||'신규 매수 중지');k='bad'}
+ else if(d.risk&&d.risk.daily_hit){t='⛔ 하루 손실 한도 도달 — 오늘은 신규 매수 안 함';k='bad'}
+ else if(pd.length){t='⏳ 눌림 대기: '+pd.map(x=>String(x.market).replace('KRW-','')+' '+f(x.trig)+'원 이하면 매수').join(', ')}
+ else if(pos.length){t='📈 보유 중 '+pos.length+'종 — 청산 규칙대로 관리 중'}
+ else t='🔎 '+(N.verdict||d.last_action||'신호 찾는 중');
+ $('why').textContent=t;$('why').className='why '+k;
+ const st=c.style||d.style;$('styles').innerHTML=Object.entries(d.styles||{}).map(([s,v])=>`<button data-s="${esc(s)}" class="${s==st?'on':''}">${esc(v)}</button>`).join('');
+ $('styles').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(b.dataset.s!==st)cmd('style',{style:b.dataset.s,page:'coin'},'스타일 변경')});
+ const rk=c.risk||(d.risk&&d.risk.mode)||'stable';
+ document.querySelectorAll('[data-r]').forEach(b=>{b.className=(b.dataset.r==rk?'on ':'')+(b.dataset.r=='aggressive'?'agg':'');
+  b.onclick=()=>{if(b.dataset.r==rk)return;if(b.dataset.r=='aggressive'&&!confirm('🔥 공격적: 진입 기준을 낮추고 더 자주 거래합니다. 손실이 커질 수 있습니다. 계속할까요?'))return;cmd('risk',{risk:b.dataset.r,page:'coin'},'투자 성향 변경')}});
+ const pb=$('pauseBtn');pb.textContent=c.paused?'▶ 신규 매수 재개':'⏸ 신규 매수 일시정지';
+ pb.onclick=()=>c.paused?cmd('resume',{page:'coin'},'매수 재개'):cmd('pause',{paused:true,page:'coin'},'일시정지');
+ $('budmeta').textContent='업비트 가용 원화 '+f(d.free_krw)+'원 · 봇 현금 '+f(d.cash)+'원';
+ $('posmeta').textContent=pos.length?`· ${pos.length}/${d.max_pos||'-'}종`:'';
+ $('pos').innerHTML=pos.length?pos.map(x=>`<div class="pc"><b>${esc(x.name||String(x.market).replace('KRW-',''))}</b> <span class="${cl(x.unreal_pct)}">${(x.unreal_pct||0)>=0?'+':''}${f(x.unreal_pct,2)}%</span><div class="mut">평가 ${f(x.value)}원 · 진입 ${esc(x.entry_price)} → ${esc(x.price)}</div></div>`).join(''):'<div class="mut">없음</div>';
+ const tr=(d.recent_trades||[]).slice().reverse();
+ $('trades').innerHTML='<tr><th>시각</th><th>코인</th><th>구분</th><th>금액</th><th>손익</th></tr>'+tr.map(x=>`<tr><td>${esc(String(x.t||'').slice(5,16))}</td><td>${esc(String(x.market||'').replace('KRW-',''))}</td><td class="${x.side=='buy'?'up':'dn'}">${x.side=='buy'?'매수':'매도'}</td><td>${f(x.krw)}</td><td class="${cl(x.pnl)}">${x.pnl!=null?sg(x.pnl):''}</td></tr>`).join('');
+ const s=D.stock||{},fc=(d.fees_card||{}).total||{},cfg=d.cfg||{};
+ $('detail').innerHTML=`<div class="mut">스타일: ${esc(d.style_label||'')} · 거래 ${f(d.trade_count)}건 · 승 ${f(d.wins)} / 패 ${f(d.losses)} · 수수료 ${f(d.fees_paid)}원</div>
+  <div class="mut">종료 시각: ${esc(d.ends_at||cfg.end_time||'-')} · 손실 한도 ${f(cfg.loss_pct,1)}% · 보호 원화 ${f(cfg.reserve_krw)}원 · 운영 상한 ${f(cfg.cap_krw)}원</div>
+  <div class="mut">장부 대조: ${esc(d.recon_overall||'-')}</div>
+  <div class="mut" style="margin-top:6px"><b>주식(모의)</b> 평가 ${f(s.equity)}원 · 오늘 <span class="${cl(s.today_pnl)}">${sg(s.today_pnl)}</span> · 누적 <span class="${cl(s.pnl_krw)}">${sg(s.pnl_krw)}</span></div>
+  ${(d.alerts||[]).length?'<div style="margin-top:6px"><b>알림</b>'+d.alerts.map(a=>`<div class="mut">${esc(String(a.t||'').slice(5,16))} ${esc(a.msg)}</div>`).join('')+'</div>':''}
+  ${(d.important_news||[]).length?'<div style="margin-top:6px"><b>주요 뉴스</b>'+d.important_news.map(n=>`<div class="mut">${esc(n.t)} ${esc(n.ko)}</div>`).join('')+'</div>':''}`;
+ if(document.activeElement!==$('endt'))$('endt').value=cfg.end_time||'';
+ if(document.activeElement!==$('lossp'))$('lossp').value=cfg.loss_pct??'';
+}
+function fresh(){if(!UPD)return;const a=Math.round((Date.now()-new Date(UPD).getTime())/1000);$('fresh').textContent=a<60?'● 실시간 ('+a+'초 전)':'⚠ 맥 미니 연결 끊김 ('+Math.round(a/60)+'분 전)';$('fresh').style.color=a<60?'var(--cy)':'var(--red)'}
+async function load(){const {data,error}=await SB.from('dash_status').select('data,updated_at').eq('id',1).maybeSingle();
+ if(error){if(/JWT|auth/i.test(error.message))return showLogin();return}
+ if(!data){$('why').textContent='권한이 없거나 데이터가 아직 없습니다.';return}
+ D=data.data;UPD=data.updated_at;fresh();render()}
+function showLogin(){$('login').classList.remove('hide');$('app').classList.add('hide')}
+async function start(){const {data:{session}}=await SB.auth.getSession();
+ if(!session)return showLogin();$('login').classList.add('hide');$('app').classList.remove('hide');load();
+ if(!window._t){window._t=setInterval(()=>{if(!document.hidden)load()},5000);setInterval(fresh,1000)}}
+$('send').onclick=async()=>{const e=$('em').value.trim().toLowerCase();if(!e)return;$('send').disabled=true;
+ const {error}=await SB.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});$('send').disabled=false;
+ $('lmsg').textContent=error?('보내지 못했습니다: '+error.message):'인증 메일을 보냈습니다. 메일의 숫자 인증번호를 입력하세요.'};
+$('verify').onclick=async()=>{const {error}=await SB.auth.verifyOtp({email:$('em').value.trim().toLowerCase(),token:$('code').value.trim(),type:'email'});
+ if(error)$('lmsg').textContent='인증 실패: '+error.message;else start()};
+$('add').onclick=()=>{const a=parseInt(($('amt').value||'').replace(/[^0-9]/g,''));if(!a)return;if(confirm(f(a)+'원을 봇 운영금에 추가할까요?'))cmd('budget',{amount:a,page:'coin'},'투입금 추가')};
+$('sub').onclick=()=>{const a=parseInt(($('amt').value||'').replace(/[^0-9]/g,''));if(!a)return;if(confirm(f(a)+'원을 봇 운영금에서 뺄까요?'))cmd('budget',{amount:-a,page:'coin'},'투입금 빼기')};
+$('saveEnd').onclick=()=>{const v=$('endt').value.trim();if(!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(v))return toast('형식: 2026-11-30 15:00',true);cmd('settings',{values:{end_time:v},page:'coin'},'종료 시각 저장')};
+$('saveLoss').onclick=()=>{const v=parseFloat($('lossp').value);if(!(v>0))return;cmd('settings',{values:{loss_pct:v},page:'coin'},'손실 한도 저장')};
+$('logout').onclick=async()=>{await SB.auth.signOut();showLogin()};
+SB.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_OUT')showLogin()});
+start();
+</script></body></html>
