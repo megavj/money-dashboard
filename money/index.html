@@ -486,11 +486,11 @@ function renderPaper(x){const card=$('papercard');if(!card)return;const p=(x&&x.
  const NM={scalp:'초단타 스캘핑',micro:'마이크로 스캘핑',day:'데이트레이딩',swing:'스윙',wonyo:'워뇨띠 스타일',vbo:'변동성 돌파',trend:'추세추종',dca:'적립식(DCA)',bh:'BTC 보유(기준)'};
  const pc=(v,d)=>v==null?'-':((v>0?'+':'')+f(v,d==null?2:d)+'%');
  meta.textContent='갱신 '+String(p.updated).slice(5,16)+' · 각 가상 100만원 · 실주문 없음 · 수수료 0.05%+호가 슬리피지 반영'+(p.stale?' · ⚠ 봇 응답 없음':'');
- body.innerHTML='<div style="overflow-x:auto"><table class="mt"><tr><th>스타일</th><th>수익률</th><th>BTC 대비</th><th>거래</th><th>승률</th><th>PF</th><th>MDD</th><th>상태</th></tr>'+
+ body.innerHTML='<div style="overflow-x:auto"><table class="mt"><tr><th>스타일 · 상태</th><th>수익률</th><th>BTC 대비</th><th>거래</th><th>승률</th><th>PF</th><th>MDD</th></tr>'+
   p.styles.map(s=>{const bench=(s.key=='dca'||s.key=='bh');
-   const st=s.open>0?('보유 '+s.open+(s.open_pos&&s.open_pos[0]?' '+esc(String(s.open_pos[0].m).replace('KRW-',''))+' '+pc(s.open_pos[0].pnl_pct,2):'')):(bench?'-':'대기');
-   const sub=(!s.open&&!bench&&s.top_rej)?'<br><span class="mut" style="font-size:10px">'+esc(s.top_rej)+'</span>':'';
-   return '<tr><td><b>'+esc(NM[s.key]||s.label)+'</b></td><td class="'+cl(s.ret_pct)+'">'+pc(s.ret_pct,2)+'</td><td class="'+cl(s.alpha_pp)+'">'+(s.alpha_pp==null?'-':((s.alpha_pp>0?'+':'')+f(s.alpha_pp,2)+'%p'))+'</td><td>'+(bench?'-':f(s.trades))+'</td><td>'+(s.win_rate==null?'-':f(s.win_rate,0)+'%')+'</td><td>'+(s.pf==null?'-':f(s.pf,2))+'</td><td class="'+cl(s.mdd_pct)+'">'+(s.mdd_pct==null?'-':f(s.mdd_pct,2)+'%')+'</td><td>'+st+' <span class="mut" style="font-size:10px">신호 '+f((s.signals||0))+'</span>'+sub+'</td></tr>'}).join('')+'</table></div>'+
+   const st=s.open>0?('보유 '+s.open+(s.open_pos&&s.open_pos[0]?' '+esc(String(s.open_pos[0].m).replace('KRW-',''))+' '+pc(s.open_pos[0].pnl_pct,2):'')):(bench?'기준선':'대기');
+   const sub=(!s.open&&!bench&&s.top_rej)?' · '+esc(s.top_rej):'';
+   return '<tr><td style="text-align:left"><b>'+esc(NM[s.key]||s.label)+'</b><br><span class="mut" style="font-size:10px">'+st+' · 신호 '+f((s.signals||0))+sub+'</span></td><td class="'+cl(s.ret_pct)+'">'+pc(s.ret_pct,2)+'</td><td class="'+cl(s.alpha_pp)+'">'+(s.alpha_pp==null?'-':((s.alpha_pp>0?'+':'')+f(s.alpha_pp,2)+'%p'))+'</td><td>'+(bench?'-':f(s.trades))+'</td><td>'+(s.win_rate==null?'-':f(s.win_rate,0)+'%')+'</td><td>'+(s.pf==null?'-':f(s.pf,2))+'</td><td class="'+cl(s.mdd_pct)+'">'+(s.mdd_pct==null?'-':f(s.mdd_pct,2)+'%')+'</td></tr>'}).join('')+'</table></div>'+
   '<div class="mut" style="margin-top:6px">BTC 대비 = 같은 기간 BTC 단순 보유와의 수익률 차(%p). 거래가 수십 건 쌓이기 전에는 결론 내리지 않습니다. 빠른 전략은 비용(수수료·스프레드)에 약합니다.</div>'}
 function renderMw(x){const card=$('mwcard');if(!card)return;const w=(x&&x.market_watch)||{};
  const meta=$('mwmeta'),box=$('mwkimp'),fund=$('mwfund'),body=$('mwbody');
