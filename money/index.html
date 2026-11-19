@@ -675,7 +675,7 @@ function renderSkills(d){if(!d||PG!='coin'||!$('skillbody'))return;const s=d.ski
  else if(rows&&typeof rows=='object')h+='<table class="mt">'+Object.entries(rows).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(typeof v=='object'?JSON.stringify(v):v)}</td></tr>`).join('')+'</table>';
  if(!h)h='<pre style="white-space:pre-wrap;font-size:11px;margin:0">'+esc(JSON.stringify(s,null,1).slice(0,2000))+'</pre>';$('skillbody').innerHTML=h}
 {const _sp=setPage;setPage=function(p){document.body.classList.toggle('pg-stock',p!='coin');_sp(p)}}document.body.classList.toggle('pg-stock',PG!='coin');
-{const _render=render;render=function(){document.body.classList.toggle('pg-stock',PG!='coin');_render();for(const fn of [renderAcct,renderGrok,renderSkills]){try{fn(D)}catch(e){console.log(e)}}}}
+{const _render=render;render=function(){document.body.classList.toggle('pg-stock',PG!='coin');_render();if(PG!='coin'&&D){try{renderV16(D)}catch(e){console.log(e)}}for(const fn of [renderAcct,renderGrok,renderSkills]){try{fn(D)}catch(e){console.log(e)}}}}
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{try{if(D){render();renderDD(D)}if(T)renderT()}catch(e){}},60)));
 addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{try{if(D){render();renderDD(D)}}catch(e){}},250)});
 
