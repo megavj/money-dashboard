@@ -158,7 +158,7 @@ td,th{word-break:keep-all}
 @media(max-width:719px){#mwkimp{grid-template-columns:repeat(2,1fr)}}
 /* v23 */
 .mxt td,.mxt th{padding:4px 6px;white-space:normal;vertical-align:top}.mxt td:first-child{width:38%}.mxt{table-layout:fixed}#mxcard .whyline{margin-top:8px}
-#eqc{width:100%;display:block}#mxddcard .tiles,#mxcard .tiles{margin-bottom:6px}
+#eqcard{display:flex;flex-direction:column}#eqc{width:100%;display:block;flex:1 1 0;min-height:200px}#mxddcard .tiles,#mxcard .tiles{margin-bottom:6px}
 </style></head><body>
 <div class="top"><div class="brandbar"><div class="logo">◢ JEV<span>//</span>TERMINAL</div><span id="modebadge" class="mode live">● 실전 LIVE</span>
 <div class="seg pgseg"><button id="pg-coin" class="on">코인 · 실전</button><button id="pg-stock">주식 · 모의</button></div>
@@ -217,8 +217,8 @@ td,th{word-break:keep-all}
 
 <div id="tab-ana" class="tab gauto">
 <div class="card coinonly wide" id="mxcard"><h3>성과 지표 <span class="mut" id="mxmeta"></span></h3><div id="mxbody"></div></div>
-<div class="card coinonly wide" id="eqcard"><h3>자산 곡선 vs BTC 그냥 보유 <span class="mut" id="eqmeta"></span></h3><div id="eqbody" style="margin-bottom:4px"></div><canvas class="ch" id="eqc" style="height:170px"></canvas></div>
-<div class="card coinonly" id="mxddcard"><h3>낙폭·회복 (v21 이후) <span class="mut" id="mxddmeta"></span></h3><div id="mxddbody"></div></div>
+<div class="card coinonly wide" id="eqcard"><h3>자산 곡선 vs BTC 그냥 보유 <span class="mut" id="eqmeta"></span></h3><div id="eqbody" style="margin-bottom:4px"></div><canvas class="ch" id="eqc"></canvas></div>
+<div class="card coinonly" id="mxddcard"><h3>리스크 감시 (v21 이후) <span class="mut" id="mxddmeta"></span></h3><div id="mxddbody"></div></div>
 <div class="card coinonly" id="mxmfecard"><h3>거래별 최대 손실·이익 (MAE/MFE) <span class="mut" id="mxmfemeta"></span></h3><div id="mxmfebody"></div></div>
 <div class="card coinonly" id="dgcard"><h3>거래 진단 (기록 기반) <span class="mut" id="dgmeta"></span></h3><div id="dgbody"></div></div>
 <div class="card" id="feecard"><h3>수수료 카드 <span class="mut" id="feemeta"></span></h3><div id="feebody"></div></div>
@@ -644,12 +644,13 @@ let h='<table class="mxt"><tr><th>지표</th><th>v21 이후</th><th>전체</th><
 +R('수수료 ÷ 총이익',A.fee_share_pct==null?NA:f(A.fee_share_pct,1)+'%',B.fee_share_pct==null?NA:f(B.fee_share_pct,1)+'%','수수료 합 '+f(A.fees)+' / '+f(B.fees)+'원')
 +R('노출 시간',f(A.exposure_pct,1)+'% <span class="mut">('+f(A.window_h,1)+'시간 중)</span>',f(B.exposure_pct,1)+'% <span class="mut">('+f(B.window_h,1)+'시간 중)</span>','포지션을 들고 있던 시간 비율'+(B.no_hold_n?' · 보유시간 기록 없는 '+B.no_hold_n+'건 제외':''))
 +R('매수 슬리피지',sl(A),sl(B),'실제 체결 − 예상 (음수=유리)')+'</table>';
-const Rr=M.rolling||{};let cls='ok',txt;
+el.innerHTML=h}
+function rollBox(M){const Rr=M.rolling||{};let cls='ok',txt;
 if(Rr.win_pct==null){cls='';txt=`최근 ${Rr.target_n}건 승률: <b>n/a</b> — v21 이후 청산 0건 · 백테스트 ${f(M.bt_win_pct,1)}%`}
 else if(Rr.warn){cls='bad';txt=`⚠ 최근 ${Rr.n}건 승률 <b>${f(Rr.win_pct,1)}%</b> — 백테스트 ${f(M.bt_win_pct,1)}%와 <b>${Rr.dev_pp>0?'+':''}${f(Rr.dev_pp,1)}%p</b> 벗어남 (기준 ±${Rr.warn_pp}%p). 시장 환경이 달라졌을 수 있어요`}
 else if(Rr.n<Rr.min_n){cls='';txt=`최근 ${Rr.n}/${Rr.target_n}건 승률 <b>${f(Rr.win_pct,1)}%</b> (백테스트 ${f(M.bt_win_pct,1)}%) — 표본이 ${Rr.min_n}건 미만이라 경고 판단은 보류`}
 else txt=`최근 ${Rr.n}/${Rr.target_n}건 승률 <b>${f(Rr.win_pct,1)}%</b> · 백테스트 ${f(M.bt_win_pct,1)}% 대비 ${Rr.dev_pp>0?'+':''}${f(Rr.dev_pp,1)}%p (정상 범위)`;
-h+=`<div class="whyline ${cls}" style="margin-top:8px">${txt}<div class="mut" style="font-size:10.5px">${esc(M.bt_note||'')}</div></div>`;el.innerHTML=h}
+return `<div class="whyline ${cls}" style="margin-top:8px"><b>승률 감시</b> · ${txt}<div class="mut" style="font-size:10.5px">${esc(M.bt_note||'')}</div></div>`}
 function renderEq(d){const c=$('eqc'),el=$('eqbody');if(!c||!el)return;const M=d.metrics,C=M&&M.curve;
 if(!C||C.error||!C.pts||C.pts.length<2){el.innerHTML='<div class="mut">'+(C&&C.error?esc(C.error):'기록이 더 쌓이면 표시됩니다')+'</div>';if(c.getContext){fit(c);c.getContext('2d').clearRect(0,0,c.width,c.height)}$('eqmeta').textContent='';return}
 $('eqmeta').textContent=esc((C.since||'').slice(5,16))+' 시작=100';
@@ -663,10 +664,12 @@ line(2,CV('--amb'));line(1,CV('--cy'));
 g.fillStyle=CV('--mut');g.font='10px monospace';g.fillText(f(hi,2),2,14);g.fillText(f(lo,2),2,c.height-16);g.fillText(f(100,1),2,Y(100)+3);
 g.fillText(new Date(t0*1000).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false}),34,c.height-3);
 const te=new Date(t1*1000).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false});g.fillText(te,c.width-10-g.measureText(te).width,c.height-3)}
+function streakBox(S){if(!S||S.error)return '';let c='ok',h;if(!S.on){c='';h='연속 손절 휴식 기능: <b>꺼짐</b>'}else if(S.active){c='bad';h=`⏸ <b>연속 손절 휴식 중</b> — 손절 ${S.n}회(${S.window_h}시간 안) → <b>~${esc(S.until_hm)}</b>까지 신규 매수 중지`}else h=`최근 ${S.window_h}시간 손절 <b>${S.recent_sl}/${S.n}회</b> · 정상 매수 가능 <span class="mut">(${S.n}회 시 ${S.pause_h}시간 휴식)</span>`;
+if(S.newlist&&S.newlist.length)h+=`<div class="mut" style="margin-top:3px">신규 상장(${S.newlist_days}일 미만) 제외: ${S.newlist.map(x=>esc(x.m.replace('KRW-',''))+' ('+x.age_d+'일째)').join(', ')}</div>`;return `<div class="whyline ${c}" style="margin-top:8px"><b>연속 손절 휴식</b> · ${h}</div>`}
 function renderMxDD(d){const el=$('mxddbody');if(!el)return;const M=d.metrics,D_=M&&M.dd;if(!D_){el.innerHTML='<div class="mut">기록이 더 쌓이면 표시됩니다</div>';return}
 $('mxddmeta').textContent='현재 '+ptxt(D_.cur_dd);
-if(!D_.max_dd){el.innerHTML=`<div class="tiles"><div class="tile"><span>최대 낙폭</span><b>0.00%</b></div><div class="tile"><span>현재 낙폭</span><b>${ptxt(D_.cur_dd)}</b></div><div class="tile"><span>기록 구간</span><b>${D_.n_pts?mdur(M.now-D_.from_t):'-'}</b></div></div><div class="mut">v21 시작 이후 고점 아래로 내려간 적이 없습니다. 입출금은 보정해 계산합니다${D_.adj_ops?' ('+D_.adj_ops+'건)':''}.</div>`;return}
-el.innerHTML=`<div class="tiles"><div class="tile"><span>최대 낙폭</span><b class="dn">${ptxt(D_.max_dd)}</b></div><div class="tile"><span>낙폭 금액</span><b class="dn">${sg(D_.max_dd_krw)}원</b></div><div class="tile"><span>고점→바닥</span><b>${mdur(D_.trough_t-D_.peak_t)}</b></div><div class="tile"><span>회복까지</span><b>${D_.recovered_t?mdur(D_.recovery_s):'<span class="dn">미회복</span>'}</b></div></div><div class="mut">고점 ${mtm(D_.peak_t)} → 바닥 ${mtm(D_.trough_t)} → ${D_.recovered_t?'회복 '+mtm(D_.recovered_t):'아직 회복 전 (고점부터 '+mdur(D_.dd_dur_s)+' 경과)'} · 현재 낙폭 ${ptxt(D_.cur_dd)}</div>`}
+if(!D_.max_dd){el.innerHTML=`<div class="tiles"><div class="tile"><span>최대 낙폭</span><b>0.00%</b></div><div class="tile"><span>현재 낙폭</span><b>${ptxt(D_.cur_dd)}</b></div><div class="tile"><span>기록 구간</span><b>${D_.n_pts?mdur(M.now-D_.from_t):'-'}</b></div></div><div class="mut">v21 시작 이후 고점 아래로 내려간 적이 없습니다. 입출금은 보정해 계산합니다${D_.adj_ops?' ('+D_.adj_ops+'건)':''}.</div>`+rollBox(M)+streakBox(d.streak);return}
+el.innerHTML=`<div class="tiles"><div class="tile"><span>최대 낙폭</span><b class="dn">${ptxt(D_.max_dd)}</b></div><div class="tile"><span>낙폭 금액</span><b class="dn">${sg(D_.max_dd_krw)}원</b></div><div class="tile"><span>고점→바닥</span><b>${mdur(D_.trough_t-D_.peak_t)}</b></div><div class="tile"><span>회복까지</span><b>${D_.recovered_t?mdur(D_.recovery_s):'<span class="dn">미회복</span>'}</b></div></div><div class="mut">고점 ${mtm(D_.peak_t)} → 바닥 ${mtm(D_.trough_t)} → ${D_.recovered_t?'회복 '+mtm(D_.recovered_t):'아직 회복 전 (고점부터 '+mdur(D_.dd_dur_s)+' 경과)'} · 현재 낙폭 ${ptxt(D_.cur_dd)}</div>`+rollBox(M)+streakBox(d.streak)}
 function renderMxMfe(d){const el=$('mxmfebody');if(!el)return;const M=d.metrics;if(!M||M.error){el.innerHTML='';return}
 $('mxmfemeta').textContent='기록 '+M.excursion_n+'/'+M.excursion_total+'건';
 const v=x=>x==null?NA:ptxt(x);
