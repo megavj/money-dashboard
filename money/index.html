@@ -669,11 +669,28 @@ function renderGrok(d){if(!d||PG!='coin'||!$('grokbtn'))return;const on=!!d.grok
   return `<tr><td>${esc(String(x.t||x.time||'').slice(5,16))}</td><td class="${a=='buy'?'up':a=='sell'?'dn':''}"><b>${esc(AN[a]||x.action||'-')}</b></td><td>${esc(String(x.coin||x.market||'-').replace('KRW-',''))}</td><td>${amt}</td><td style="text-align:left;white-space:normal">${esc(x.reason||'')}${x.status?' <span class="pill">'+esc(x.status)+'</span>':''}</td></tr>`}).join('')+'</table></div>'
   :'<div class="mut">아직 그록봇 판단이 없습니다.'+(on?' 곧 첫 판단이 기록됩니다.':' 위의 \'그록봇에게 맡기기\'를 켜면 판단 기록이 여기에 쌓입니다.')+'</div>'}
 function renderSkills(d){if(!d||PG!='coin'||!$('skillbody'))return;const s=d.skills_report;if(!s)return;
- $('skillmeta').textContent=String(s.updated||s.time||s.generated_at||'');let h='';if(s.summary)h+=`<div style="margin-bottom:6px;color:var(--tx)">${esc(s.summary)}</div>`;
- const rows=s.styles||s.rows||s.results;
- if(Array.isArray(rows)&&rows.length&&typeof rows[0]=='object'){const ks=Object.keys(rows[0]).slice(0,8);h+='<div class="scrollbox"><table class="mt"><tr>'+ks.map(k=>`<th>${esc(k)}</th>`).join('')+'</tr>'+rows.map(r=>'<tr>'+ks.map(k=>{const v=r[k];return `<td class="${typeof v=='number'&&/pnl|ret|수익|ev/i.test(k)?cl(v):''}">${esc(typeof v=='number'?f(v,2):(typeof v=='object'?JSON.stringify(v):v))}</td>`}).join('')+'</tr>').join('')+'</table></div>'}
- else if(rows&&typeof rows=='object')h+='<table class="mt">'+Object.entries(rows).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(typeof v=='object'?JSON.stringify(v):v)}</td></tr>`).join('')+'</table>';
- if(!h)h='<pre style="white-space:pre-wrap;font-size:11px;margin:0">'+esc(JSON.stringify(s,null,1).slice(0,2000))+'</pre>';$('skillbody').innerHTML=h}
+ const SN={aggressive:'초단타 공격',balanced:'단타 균형',swing:'스윙 안정',wonyo:'워뇨띠',micro:'마이크로'},MN={stable:'안정적',aggressive:'공격적',old:'기존 규칙'};
+ const pc=(v,d2)=>v==null?'-':`<span class="${cl(v)}">${v>0?'+':''}${f(v,d2==null?2:d2)}%</span>`;
+ const D0=s.data||{};$('skillmeta').textContent=(s.version?'v'+s.version+' · ':'')+String(s.generated_at||s.updated||'');
+ let h='';
+ if(s.styles&&typeof s.styles=='object'&&!Array.isArray(s.styles)){
+  $('skillcard').classList.replace('s4','s8');
+  h+=`<div class="mut" style="font-size:11.5px;margin-bottom:5px">${esc(D0.source||'')} · ${esc(D0.period||'')} · ${D0.coins||'-'}개 코인 · 기간 중 BTC ${pc(D0.btc_change_pct,1)} · 검증: 앞 구간으로 만들고 뒤 구간(처음 보는 기간)으로 확인</div>`;
+  h+='<div class="scrollbox" style="overflow-x:auto"><table class="mt"><tr><th>스타일</th><th>성향</th><th>규칙</th><th>거래</th><th>승률</th><th>거래당 순익</th><th>처음 보는 구간</th><th>기간 수익률</th><th>최대 낙폭</th><th>비용↑ 시</th></tr>';
+  for(const [sk,mm] of Object.entries(s.styles)){const ent=Object.entries(mm||{});ent.forEach(([mk,r],i)=>{const a=r.all||{},o=r.out_of_sample||{};const old=mk=='old';
+   h+=`<tr style="${old?'opacity:.6':''}${i==0?';border-top:1px solid var(--line)':''}"><td>${i==0?'<b>'+esc(SN[sk]||sk)+'</b>':''}</td><td>${esc(MN[mk]||mk)}</td><td style="text-align:left">${esc((r.rules||[]).join('+'))}${r.coins?' <span class="mut">('+r.coins.length+'코인)</span>':''}</td><td>${f(a.trades)}</td><td>${a.win_rate_pct==null?'-':f(a.win_rate_pct,1)+'%'}</td><td>${pc(a.avg_net_pct,3)}</td><td>${pc(o.avg_net_pct,3)}</td><td>${pc(a.portfolio_return_pct,1)}</td><td class="dn">${a.max_drawdown_pct==null?'-':'-'+f(a.max_drawdown_pct,1)+'%'}</td><td>${pc(r.cost_stress_avg_net_pct,3)}</td></tr>`})}
+  h+='</table></div>';
+  if(s.active&&typeof s.active=='object')h+='<div style="margin-top:6px;font-size:12px"><b style="color:var(--cy)">현재 적용</b> '+Object.entries(s.active).map(([k,v])=>`<span class="mut">${esc(SN[k]||k)}:</span> ${esc(v)}`).join(' · ')+'</div>';
+  if(Array.isArray(s.adopted)&&s.adopted.length)h+='<div style="margin-top:4px;font-size:12px"><b style="color:var(--cy)">채택</b> '+s.adopted.map(a=>`<b>${esc(a.rule)}</b> <span class="mut">${esc(a.desc||'')} (${esc(a.why||'')})</span>`).join(' · ')+'</div>';
+  if(Array.isArray(s.rejected)&&s.rejected.length)h+='<div style="margin-top:4px;font-size:12px"><b style="color:var(--red)">버림 '+s.rejected.length+'개</b> <span class="mut">'+s.rejected.slice(0,4).map(r=>esc(r.rule)+' ('+esc(r.result||r.why||'')+')').join(' · ')+'</span></div>';
+  if(s.crash_breaker)h+=`<div class="mut" style="margin-top:4px;font-size:12px">🛡 ${esc(s.crash_breaker)}</div>`;
+  if(s.expectations)h+=`<div class="warnnote">${esc(s.expectations)}</div>`;
+ }else{
+  if(s.summary)h+=`<div style="margin-bottom:6px">${esc(s.summary)}</div>`;
+  const rows=s.rows||s.results;
+  if(Array.isArray(rows)&&rows.length&&typeof rows[0]=='object'){const ks=Object.keys(rows[0]).slice(0,8);h+='<div class="scrollbox" style="overflow-x:auto"><table class="mt"><tr>'+ks.map(k=>`<th>${esc(k)}</th>`).join('')+'</tr>'+rows.map(r=>'<tr>'+ks.map(k=>{const v=r[k];return `<td>${esc(typeof v=='number'?f(v,2):(typeof v=='object'?JSON.stringify(v):v))}</td>`}).join('')+'</tr>').join('')+'</table></div>'}
+  if(!h)h='<pre style="white-space:pre-wrap;font-size:11px;margin:0;max-height:260px;overflow:auto">'+esc(JSON.stringify(s,null,1).slice(0,2000))+'</pre>'}
+ $('skillbody').innerHTML=h}
 {const _sp=setPage;setPage=function(p){document.body.classList.toggle('pg-stock',p!='coin');_sp(p)}}document.body.classList.toggle('pg-stock',PG!='coin');
 {const _render=render;render=function(){document.body.classList.toggle('pg-stock',PG!='coin');_render();if(PG!='coin'&&D){try{renderV16(D)}catch(e){console.log(e)}}for(const fn of [renderAcct,renderGrok,renderSkills]){try{fn(D)}catch(e){console.log(e)}}}}
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{try{if(D){render();renderDD(D)}if(T)renderT()}catch(e){}},60)));
