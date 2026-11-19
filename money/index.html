@@ -126,6 +126,7 @@ body{padding:0 clamp(8px,1.1vw,22px) 70px}
 @media(max-width:899px){.gauto>.wide{grid-column:1/-1}}
 @media(max-width:719px){.tab.on.g12,.tab.on.gauto{display:block}.tab.on>.card,.tab.on>.panel{margin:8px 0}nav button{font-size:11px;padding:12px 0}.pgseg{order:9;flex:1 1 100%}.pgseg button{flex:1}.big{font-size:26px}.kv4{grid-template-columns:repeat(2,1fr)}.gl2{grid-template-columns:1fr}#chcard .ch{height:170px}.mt{font-size:11px}.mt td,.mt th{white-space:normal;padding:3px 2px}.card,.panel{min-width:0;overflow-x:auto}.pill{padding:0 4px}}
 /* ===== v22: 탭별 디자인 정리 ===== */
+body.pg-stock .coinonly{display:none!important}
 td,th{word-break:keep-all}
 .kv4 b{white-space:normal;overflow:visible}
 .tab.on#tab-watch,.tab.on#tab-recs,.tab.on#tab-settings{display:block}
@@ -673,7 +674,8 @@ function renderSkills(d){if(!d||PG!='coin'||!$('skillbody'))return;const s=d.ski
  if(Array.isArray(rows)&&rows.length&&typeof rows[0]=='object'){const ks=Object.keys(rows[0]).slice(0,8);h+='<div class="scrollbox"><table class="mt"><tr>'+ks.map(k=>`<th>${esc(k)}</th>`).join('')+'</tr>'+rows.map(r=>'<tr>'+ks.map(k=>{const v=r[k];return `<td class="${typeof v=='number'&&/pnl|ret|수익|ev/i.test(k)?cl(v):''}">${esc(typeof v=='number'?f(v,2):(typeof v=='object'?JSON.stringify(v):v))}</td>`}).join('')+'</tr>').join('')+'</table></div>'}
  else if(rows&&typeof rows=='object')h+='<table class="mt">'+Object.entries(rows).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(typeof v=='object'?JSON.stringify(v):v)}</td></tr>`).join('')+'</table>';
  if(!h)h='<pre style="white-space:pre-wrap;font-size:11px;margin:0">'+esc(JSON.stringify(s,null,1).slice(0,2000))+'</pre>';$('skillbody').innerHTML=h}
-{const _render=render;render=function(){_render();for(const fn of [renderAcct,renderGrok,renderSkills]){try{fn(D)}catch(e){console.log(e)}}}}
+{const _sp=setPage;setPage=function(p){document.body.classList.toggle('pg-stock',p!='coin');_sp(p)}}document.body.classList.toggle('pg-stock',PG!='coin');
+{const _render=render;render=function(){document.body.classList.toggle('pg-stock',PG!='coin');_render();for(const fn of [renderAcct,renderGrok,renderSkills]){try{fn(D)}catch(e){console.log(e)}}}}
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{try{if(D){render();renderDD(D)}if(T)renderT()}catch(e){}},60)));
 addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{try{if(D){render();renderDD(D)}}catch(e){}},250)});
 
