@@ -629,9 +629,9 @@ function renderAcct(d){if(!d||PG!='coin'||!$('acctcard'))return;const a=d.accoun
  const G=a.groups||{};const ks=['krw','usdt','bot','protected','other'].filter(k=>(G[k]||0)>=1);
  $('ac_bar').innerHTML=ks.map(k=>`<i style="width:${G[k]/a.total*100}%;background:${GCOL[k]}" title="${GLAB[k]}"></i>`).join('');
  $('ac_leg').innerHTML=ks.map(k=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${GCOL[k]}"></i> ${GLAB[k]} <b>${f(G[k])}</b> ${f(G[k]/a.total*100,1)}%</span>`).join('');
- const rows=(a.rows||[]).filter(r=>r.value>=1);
+ const rows=(a.rows||[]).filter(r=>r.value>=1||(r.group=='protected'&&r.bal>=1));
  $('ac_rows').innerHTML='<tr><th>자산</th><th>수량</th><th>현재가</th><th>평가(원)</th><th>손익</th></tr>'+`<tr><td>KRW</td><td>-</td><td>-</td><td>${f(G.krw)}</td><td></td></tr>`+
-  rows.map(r=>`<tr><td>${esc(r.cur)} <span class="pill" style="font-size:10px">${GLAB[r.group]||''}</span></td><td>${f(r.bal,r.bal<10?4:r.bal<1000?2:0)}</td><td>${f(r.price,r.price<100?2:0)}</td><td>${f(r.value)}</td><td class="${cl(r.pnl)}">${r.pnl==null?'-':sg(r.pnl)+' ('+(r.pnl_pct>0?'+':'')+f(r.pnl_pct,2)+'%)'}</td></tr>`).join('');
+  rows.map(r=>`<tr><td>${esc(r.cur)} <span class="pill" style="font-size:10px">${GLAB[r.group]||''}</span></td><td>${f(r.bal,r.bal<10?4:r.bal<1000?2:0)}</td><td>${r.price==null?'<span class="mut">시세없음</span>':f(r.price,r.price<100?2:0)}</td><td>${f(r.value)}</td><td class="${cl(r.pnl)}">${r.pnl==null?'-':sg(r.pnl)+' ('+(r.pnl_pct>0?'+':'')+f(r.pnl_pct,2)+'%)'}</td></tr>`).join('');
  $('acctmeta').textContent=(a.usdt_price?'USDT '+f(a.usdt_price,1)+'원 · ':'')+'갱신 '+String(a.checked_at||'').slice(11,19)+(a.error?' · ⚠ '+a.error:'');
  if($('g_eq')){$('g_eq').textContent=f(a.total)+'원';$('g_eqs').textContent=sg(a.today_pnl);$('g_eqs').className=cl(a.today_pnl)}}
 function renderGrok(d){if(!d||PG!='coin'||!$('grokbtn'))return;const on=!!d.grok_mode;const b=$('grokbtn');b.classList.toggle('on',on);
