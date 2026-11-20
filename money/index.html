@@ -159,63 +159,63 @@ td,th{word-break:keep-all}
 /* v23 */
 .mxt td,.mxt th{padding:4px 6px;white-space:normal;vertical-align:top}.mxt td:first-child{width:38%}.mxt{table-layout:fixed}#mxcard .whyline{margin-top:8px}
 #eqcard{display:flex;flex-direction:column}#eqc{width:100%;display:block;flex:1 1 0;min-height:200px}#mxddcard .tiles,#mxcard .tiles{margin-bottom:6px}
+
+/* ===== dash1 (2026-11-20): 홈 핵심 5 · 탭 재편 · 보고함 · 안전장치 ===== */
+.kpi5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.kpi5>div{background:var(--in);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-width:0}
+.kpi5 small{display:block;font-size:11px;color:var(--mut);margin-bottom:2px}.kpi5 b{display:block;font-size:22px;font-weight:800;color:var(--hi);line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kpi5 i{font-style:normal;display:block;font-size:11.5px;color:var(--mut);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kpi5 b.up{color:var(--cy)}.kpi5 b.dn{color:var(--red)}.kpi5 b.warn{color:var(--amb)}
+.kmode{margin-top:8px;font-size:12.5px;line-height:1.5}.kmode b{color:var(--hi)}.kmode .pill{margin-right:4px}
+.kalerts{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}.kalerts span{display:inline-block;padding:3px 9px;border-radius:5px;font-size:12px;border:1px solid var(--line);background:var(--in)}
+.kalerts span.bad{border-color:var(--red);color:#ff9aa5;background:rgba(255,77,94,.1)}.kalerts span.warn{border-color:var(--amb);color:#ffd88a;background:rgba(255,176,32,.1)}.kalerts span.ok{border-color:var(--cy);color:var(--cy);background:rgba(25,227,209,.07)}
+.kalerts span[data-t]{cursor:pointer}
+.nbadge{display:inline-block;min-width:16px;padding:0 4px;margin-left:3px;border-radius:8px;background:var(--pink);color:#fff;font-size:10px;line-height:16px;font-weight:800;vertical-align:1px}.nbadge:empty{display:none}
+.tab-note{grid-column:1/-1;font-size:12px;color:var(--mut);padding:4px 2px}
+.tab.on#tab-reports,.tab.on#tab-futures,.tab.on#tab-settings{display:block}.tab.on#tab-reports>.card,.tab.on#tab-futures>.card,.tab.on#tab-settings>.card{margin:0 0 10px}
+#tab-market.tab.on{align-items:start}#watchcard #wq{width:60%!important;max-width:420px}#watchcard #wlist{margin-top:8px}#recscard #recs{margin-top:6px}
+.rp{border:1px solid var(--line);border-left:3px solid var(--mut);border-radius:6px;padding:8px 10px;margin:6px 0;background:var(--in)}.rp.unread{border-left-color:var(--pink)}.rp.urgent{border-left-color:var(--red)}.rp.warn{border-left-color:var(--amb)}
+.rp .rh{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;cursor:pointer}.rp .rh b{color:var(--hi);font-size:13px;flex:1 1 auto}.rp .rk{font-size:10.5px;padding:1px 7px;border-radius:9px;border:1px solid var(--line);color:var(--mut)}.rp time{font-size:11px;color:var(--mut)}
+.rp .rs{margin-top:4px;font-size:12.5px;line-height:1.5;color:var(--tx)}.rp .rb{display:none;margin-top:8px;white-space:pre-wrap;font-size:12px;line-height:1.55;color:var(--tx);border-top:1px dashed var(--line);padding-top:8px}.rp.open .rb{display:block}.rp .rf{margin-top:6px;font-size:11px;color:var(--mut)}
+.gtbl td:first-child{text-align:left;width:40%}.gtbl td.diff{color:var(--amb);font-weight:700}.gtbl td.bad{color:#ff9aa5;font-weight:700}.gtbl td.ok{color:var(--cy)}
+.gnote{margin-top:6px;font-size:12px}
+@media(max-width:719px){.kpi5{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi5>div:first-child{grid-column:1/-1}.kpi5 b{font-size:20px}#glance{display:none!important}}
+@media(min-width:720px) and (max-width:1279px){.kpi5{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head><body>
 <div class="top"><div class="brandbar"><div class="logo">◢ JEV<span>//</span>TERMINAL</div><span id="modebadge" class="mode live">● 실전 LIVE</span>
 <div class="seg pgseg"><button id="pg-coin" class="on">코인 · 실전</button><button id="pg-stock">주식 · 모의</button></div>
 <span class="mut" id="clockline2"></span><span class="sub1" id="clockline"></span><button id="thm" class="sm" title="라이트/다크 테마 전환">◐</button><span id="hb" class="hb" title="데이터 갱신 신호"></span></div>
 <div id="glance"><div><small>총자산</small><b id="g_eq">-</b><i id="g_eqs"></i></div><div><small>오늘 손익</small><b id="g_td">-</b></div><div><small>보유</small><b id="g_pos">-</b></div><div><small>알림</small><b id="g_al">-</b></div></div></div>
-<nav><button class="on" data-t="home">현황</button><button data-t="ana">분석</button><button data-t="eng">엔진</button><button data-t="trades">거래</button><button data-t="news">뉴스</button><button data-t="watch">관심</button><button data-t="recs">추천</button><button data-t="settings">설정</button><button data-t="log">기록</button></nav>
-<div id="paperbanner" class="banner" style="display:none">실전 주문 보류 중 — 모의 운영 (가상 자금으로만 매매하며, 증권사 실제 주문은 전혀 나가지 않습니다)</div>
+<nav><button class="on" data-t="home">현황</button><button data-t="ana">성과</button><button data-t="eng">전략</button><button data-t="trades">거래</button><button data-t="reports">보고함<span id="rpbadge" class="nbadge"></span></button><button data-t="market">시장</button><button data-t="futures">선물</button><button data-t="settings">설정</button><button data-t="log">기록</button></nav>
+<div id="paperbanner" class="banner" style="display:none">주식은 모의 운영 — 증권사 실제 주문은 전혀 나가지 않습니다. 이 페이지의 대부분 카드는 구 엔진(stockbot, 퇴출 예정) 화면이고, 신 모의투자(S1~S3)는 아래 "주식 모의 (신)" 카드에 있습니다.</div>
 
-<div id="tab-home" class="tab on g12">
+<div id="tab-home" class="tab on g12"><!-- dash1 -->
 <div id="reconbanner" class="halt s12" style="display:none"></div>
 <div id="haltbox" class="s12"></div>
 <div id="urgbanner" class="halt s12" style="display:none"></div>
-
-<div class="card s4 coinonly" id="acctcard"><h3>계좌 총자산 <span class="mut" id="acctmeta"></span></h3>
-<div class="big" id="ac_total">-</div><div id="ac_today" class="acsub"></div>
-<div class="acbar" id="ac_bar"></div><div class="acleg" id="ac_leg"></div>
-<table class="mt" id="ac_rows"></table></div>
-
-<div class="card s4 hero" id="herocard"><div class="row" style="align-items:center"><div style="flex:0 0 auto"><span id="stbadge" class="badge"></span></div><div class="mut" id="sub" style="text-align:right"></div></div>
+<div class="card s12" id="kpicard"><div class="kpi5" id="kpi5">
+<div><small>총자산</small><b id="k_total">-</b><i id="k_total_s"></i></div>
+<div><small>오늘 손익</small><b id="k_today">-</b><i id="k_today_s"></i></div>
+<div><small>누적 손익</small><b id="k_cum">-</b><i id="k_cum_s"></i></div>
+<div><small>보유 포지션</small><b id="k_pos">-</b><i id="k_pos_s"></i></div>
+<div><small>시스템</small><b id="k_sys">-</b><i id="k_sys_s"></i></div></div>
+<div id="k_mode" class="kmode"></div><div id="k_alerts" class="kalerts"></div></div>
+<div class="card s8 hero" id="herocard"><div class="row" style="align-items:center"><div style="flex:0 0 auto"><span id="stbadge" class="badge"></span></div><div class="mut" id="sub" style="text-align:right"></div></div>
 <div class="oneline" id="oneline" style="margin:6px 0"></div>
 <div class="mut">봇 운영 평가금액</div><div class="big2" id="eq">-</div><div id="pnl" style="font-size:15px"></div>
 <div class="kv4"><div><small>봇 오늘 손익</small><b id="tpnl">-</b></div><div><small>봇 현금</small><b id="cash">-</b></div><div><small>승률</small><b id="wr">-</b></div><div><small>종료까지</small><b id="left">-</b></div></div>
 <div id="whyline" class="whyline"></div><div id="streakline" class="whyline coinonly" style="display:none"></div></div>
-
-<div class="card s4" id="stylecard">
-<button id="grokbtn" class="grokbtn coinonly">🤖 그록봇에게 맡기기</button><div class="mut coinonly" id="grokdesc" style="margin:4px 0 8px"></div>
-<h3>투자 스타일 <span class="mut" id="stylemeta"></span></h3><div class="btns" id="stylebtns"></div>
-<div class="mut" style="margin-top:8px">투자 성향 <span class="mut">(모든 스타일과 조합)</span></div><div class="btns riskb" id="riskbtns"><button data-r="aggressive">🔥 공격적</button><button data-r="stable">🛡 안정적</button></div><div class="mut" id="riskdesc" style="margin-top:4px"></div>
-<div style="margin-top:8px"><button id="pausebtn" style="width:100%"></button></div><div class="msg" id="ctlmsg"></div><div class="autobox" id="autobox" style="display:none"></div><div class="mut" id="presetdesc"></div></div>
-
 <div class="card s8" id="chcard"><h3>자산 추이 · 목표 · 손실 한도</h3><canvas class="ch" id="ch"></canvas>
 <div class="gl2"><div><div class="mut" id="goaltxt">목표</div><div class="bar"><i id="goalbar" style="background:linear-gradient(90deg,#0b8f84,var(--cy));width:0"></i></div></div>
 <div><div class="mut" id="losstxt">손실 한도</div><div class="bar"><i id="lossbar" style="background:var(--cy);width:0"></i></div></div></div><div id="mood" class="mut" style="margin-top:4px"></div></div>
-
+<div class="card s4" id="ctlcard"><h3>조작</h3>
+<div class="btns" style="grid-template-columns:1fr"><button id="pausebtn" style="width:100%"></button><button class="warn" id="liqbtn">포지션 즉시 정리</button></div>
+<div class="msg" id="ctlmsg2"></div>
+<div class="mut" style="margin-top:6px">스타일·성향·그록 맡기기는 <b>전략</b> 탭, 투입금액·안전장치는 <b>설정</b> 탭, 보고·조언은 <b>보고함</b> 탭에 있습니다.</div></div>
 <div class="card s4" id="poscard"><h3>보유 포지션 <span class="mut" id="posmeta"></span></h3><div id="pos" class="pcards mut">없음</div></div>
-
-<div class="card s4" id="moneycard"><h3>투입금액 <span class="mut" id="moneyhint"></span></h3>
-<div class="row"><div style="flex:2"><input id="amt" type="number" inputmode="numeric" placeholder="금액(원)" min="1" style="width:100%"></div>
-<div style="flex:1"><button class="ok" id="addbtn" style="width:100%">＋ 추가</button></div><div style="flex:1"><button class="warn" id="subbtn" style="width:100%">－ 빼기</button></div></div>
-<div style="margin-top:6px"><span class="chip" data-a="10000">1만</span><span class="chip" data-a="50000">5만</span><span class="chip" data-a="100000">10만</span><span class="chip" data-a="1000000">100만</span></div>
-<div class="mut" id="moneyinfo"></div></div>
-
-<div class="card s4" id="lastcard"><h3>최근 거래 5건 <span class="mut" id="lastmeta"></span></h3><table id="last5"></table></div>
-<div class="card s4 coinonly" id="grokcard"><h3>🤖 그록봇 판단 기록 <span class="mut" id="grokmeta"></span></h3><div id="grokbody" class="mut">아직 그록봇 판단이 없습니다.</div></div>
-
-<div class="card s4 coinonly" id="nocard"><h3>왜 안 샀나 <span class="mut" id="nometa"></span></h3><div id="nobody"></div></div>
 <div class="card s4 coinonly" id="alertcard"><h3>알림 센터 <span class="mut" id="alertmeta"></span></h3><div id="alertchips" style="margin-bottom:4px"></div><div id="alertbody" class="scrollbox"></div><div class="mut" style="margin-top:6px">긴급: 봇 멈춤·잔고 불일치·매수 중지·긴급정지 / 알림: 체결·±3% 손익·공지 / 기록: 시스템 기록</div></div>
-<div class="card s4" id="impcard"><h3>🔥 중요 뉴스 요약</h3><div id="impbox" class="mut scrollbox">없음</div></div>
-<div class="card s4 coinonly" id="skillcard"><h3>거래 스킬 검증 리포트 <span class="mut" id="skillmeta"></span></h3><div id="skillbody" class="mut">검증 리포트 준비 중입니다. 완료되면 여기에 스타일별 수익률·승률·최대 손실이 표시됩니다.</div></div>
-<div class="card s4 coinonly" id="sccard"><h3>스타일 성적표 <span class="mut" id="scmeta"></span></h3><div id="scbody"></div></div>
-<div class="card s12 coinonly" id="mwcard"><h3>김프·펀딩비 <span class="mut" id="mwmeta"></span></h3>
-<div id="mwkimp" class="kv4"></div>
-<div class="mut" id="mwfund" style="margin:6px 0 4px"></div>
-<div id="mwbody"></div></div>
-<div class="card s12 coinonly" id="papercard"><h3>스타일별 모의투자 <span class="mut" id="papermeta"></span></h3>
-<div id="paperbody"></div></div>
+<div class="card s12 stockonly" id="spcard" style="display:none"><h3>주식 모의 (신) S1~S3 — stock_paper <span class="mut" id="spmeta"></span></h3><div id="spbody" class="mut">불러오는 중…</div>
+<div class="mut" style="margin-top:6px">위 다른 카드들은 구 엔진(stockbot)의 화면입니다. 구 엔진은 퇴출 예정이며, 이 카드가 신 모의투자(네이버 금융 공개 시세·실주문 없음)의 집계입니다.</div></div>
 </div>
+
 
 <div id="tab-ana" class="tab gauto">
 <div class="card coinonly wide" id="mxcard"><h3>성과 지표 <span class="mut" id="mxmeta"></span></h3><div id="mxbody"></div></div>
@@ -233,9 +233,26 @@ td,th{word-break:keep-all}
 <div class="card" id="sigcard"><h3>Jev 점수대별 적중률 <span class="mut" id="sigmeta"></span></h3><div class="mut" id="sighead" style="margin-bottom:4px"></div><div id="sigbody"></div><div class="mut" id="sigblk" style="margin-top:6px"></div></div>
 <div class="card coinonly" id="vercard"><h3>설정 변경 표식·버전별 성적 <span class="mut" id="vermeta"></span></h3><div id="verbody"></div></div>
 <div class="card coinonly" id="latcard"><h3>체결 지연 <span class="mut" id="latmeta"></span></h3><div id="latbody"></div></div>
+<div class="card s4 coinonly wide" id="acctcard"><h3>계좌 총자산 <span class="mut" id="acctmeta"></span></h3>
+<div class="big" id="ac_total">-</div><div id="ac_today" class="acsub"></div>
+<div class="acbar" id="ac_bar"></div><div class="acleg" id="ac_leg"></div>
+<table class="mt" id="ac_rows"></table></div>
 </div>
 
+
 <div id="tab-eng" class="tab gauto">
+<div class="tab-note">전략 현황: 지금은 대시보드 "스타일"이 한도·성향 표시이고, 맡기기 모드에서는 그록 규칙(dip_bear·vbo_ma5)이 진입을 정합니다. 설계서 1단계(투자정책서·사다리) 뒤에 전략별 단계 보드로 바뀝니다.</div>
+<div class="card" id="stylecard">
+<button id="grokbtn" class="grokbtn coinonly">🤖 그록봇에게 맡기기</button><div class="mut coinonly" id="grokdesc" style="margin:4px 0 8px"></div>
+<h3>투자 스타일 <span class="mut" id="stylemeta"></span></h3><div class="btns" id="stylebtns"></div>
+<div class="mut" style="margin-top:8px">투자 성향 <span class="mut">(모든 스타일과 조합)</span></div><div class="btns riskb" id="riskbtns"><button data-r="aggressive">🔥 공격적</button><button data-r="stable">🛡 안정적</button></div><div class="mut" id="riskdesc" style="margin-top:4px"></div>
+<div class="msg" id="ctlmsg"></div><div class="autobox" id="autobox" style="display:none"></div><div class="mut" id="presetdesc"></div></div>
+<div class="card coinonly" id="sccard"><h3>스타일 성적표 <span class="mut" id="scmeta"></span></h3><div id="scbody"></div></div>
+<div class="card coinonly wide" id="skillcard"><h3>거래 스킬 검증 리포트 <span class="mut" id="skillmeta"></span></h3><div id="skillbody" class="mut">검증 리포트 준비 중입니다. 완료되면 여기에 스타일별 수익률·승률·최대 손실이 표시됩니다.</div></div>
+<div class="card coinonly wide" id="papercard"><h3>스타일별 모의투자 <span class="mut" id="papermeta"></span></h3>
+<div id="paperbody"></div></div>
+<div class="card" id="healthcard"><h3>봇 상태</h3><div id="health" class="mut"></div><div class="mut" id="last"></div>
+</div>
 <section class="panel"><h4>PIPELINE <small>봇 단계별 실시간 상태</small></h4><div id="t_pipe" class="mut">불러오는 중…</div></section>
 <section class="panel"><h4>LIVE FLOW <small id="t_flowmeta"></small></h4><div id="t_flow" class="mut"></div></section>
 <section class="panel"><h4>FILTER RULES <small id="t_rulemeta"></small></h4><div id="t_rules" class="mut"></div></section>
@@ -245,30 +262,67 @@ td,th{word-break:keep-all}
 <section class="panel"><h4>MODE STATS <small>모드별 성과</small></h4><div id="t_modes"></div></section>
 <section class="panel" id="p_micro" style="display:none"><h4 title="⚠ 업비트 왕복 수수료는 0.10%입니다.">MICRO ENGINE ⚠ <small id="t_microm"></small></h4><div id="t_micro"></div></section>
 <div class="card" id="scancard"><h3>Jev 최근 스캔 상위</h3><span class="mut" id="scanmeta"></span><table id="top"></table><div class="mut" id="jev" style="margin-top:6px"></div><div class="mut" id="hit"></div></div>
-<div class="card" id="healthcard"><h3>봇 상태</h3><div id="health" class="mut"></div><div class="mut" id="last"></div>
-<div style="margin-top:8px"><button class="sm warn" id="liqbtn">포지션 즉시 정리</button></div></div>
 <div class="card coinonly" id="lstcard"><h3>업비트 공지 감시 <span class="mut" id="lstmeta"></span></h3><div id="lstbody"></div></div>
 <section class="panel rlpanel wide"><h4>REASON LOG <small>봇의 판단 근거 · 실시간</small></h4><div id="t_log" class="rlog">불러오는 중…</div></section>
 </div>
 
+
 <div id="tab-trades" class="tab gauto">
 <div class="card wide" id="trcard"><h3>거래 내역</h3><div id="trchips"></div><table id="tr"></table></div>
 <div class="card" id="alcard"><h3>알림 (±3% 단위·목표·한도)</h3><div id="al" class="mut">없음</div></div>
+<div class="card" id="lastcard"><h3>최근 거래 5건 <span class="mut" id="lastmeta"></span></h3><table id="last5"></table></div>
+<div class="card coinonly wide" id="grokcard"><h3>🤖 그록봇 판단 기록 <span class="mut" id="grokmeta"></span></h3><div id="grokbody" class="mut">아직 그록봇 판단이 없습니다.</div></div>
+<div class="card coinonly" id="nocard"><h3>왜 안 샀나 <span class="mut" id="nometa"></span></h3><div id="nobody"></div></div>
 </div>
 
-<div id="tab-news" class="tab gauto"><div class="card"><h3>🔥 중요 뉴스 요약</h3><div id="impbox2" class="mut">없음</div></div><div class="card wide"><div id="nchips"></div><div class="mut" id="nmeta"></div><div id="nlist"></div></div></div>
 
-<div id="tab-watch" class="tab"><div class="card"><h3>관심 종목 추가</h3>
-<input id="wq" placeholder="" style="width:62%"> <button class="sm" id="wadd">추가</button><div class="msg" id="wmsg"></div><div class="mut" id="whint"></div></div><div id="wlist"></div></div>
+<div id="tab-reports" class="tab">
+<div class="card"><h3>보고함 <span class="mut" id="rpmeta"></span></h3><div id="rpchips" style="margin-bottom:6px"></div><div id="rplist" class="mut">보고가 없습니다.</div>
+<div class="mut" style="margin-top:8px">일일 21:00 · 특정(이벤트) · 주간(토) · 월간 · 조언(변경 전) · 자료조사. 보고 서비스가 <code>reports/*.json</code> 에 쓰면 30초 안에 여기에 나타납니다. 읽음 표시는 이 기기에만 저장됩니다.</div></div>
+<div class="card"><h3>질문·조사 요청</h3><div class="mut">보고 서비스(로드맵 6단계) 설치 후 여기에서 질문을 보내면 자료조사 보고가 생성됩니다. 지금은 카톡으로 요청해 주세요.</div></div>
+</div>
 
-<div id="tab-recs" class="tab"><div class="mut" style="padding:4px">Jev 점수는 참고용 확률입니다. 수익을 보장하지 않습니다.</div><div id="recs"></div></div>
 
-<div id="tab-settings" class="tab"><div class="card"><h3>설정 <span class="mut" id="setmeta"></span></h3><div id="setform"></div>
-<div class="row" style="margin-top:10px"><div><button class="ok" id="setsave" style="width:100%">저장</button></div><div><button class="sm warn" id="setreset" style="width:100%">기본값으로 초기화</button></div></div></div></div>
+<div id="tab-market" class="tab gauto">
+<div class="card"><h3>🔥 중요 뉴스 요약</h3><div id="impbox2" class="mut">없음</div></div>
+<div class="card" style="display:none" id="impcard"><h3>🔥 중요 뉴스 요약</h3><div id="impbox" class="mut scrollbox">없음</div></div>
+<div class="card wide"><div id="nchips"></div><div class="mut" id="nmeta"></div><div id="nlist"></div></div>
+<div class="card wide" id="watchcard"><h3>관심 종목 추가</h3>
+<input id="wq" placeholder="" style="width:62%"> <button class="sm" id="wadd">추가</button><div class="msg" id="wmsg"></div><div class="mut" id="whint"></div><div id="wlist"></div></div>
+<div class="card wide" id="recscard"><h3>Jev 추천 <span class="mut">참고용 확률 · 수익 보장 없음</span></h3><div id="recs"></div></div>
+<div class="card coinonly wide" id="mwcard"><h3>김프·펀딩비 <span class="mut" id="mwmeta"></span></h3>
+<div id="mwkimp" class="kv4"></div>
+<div class="mut" id="mwfund" style="margin:6px 0 4px"></div>
+<div id="mwbody"></div></div>
+</div>
 
-<div id="tab-log" class="tab gauto"><div class="card"><h3>이벤트 기록</h3><div id="evlog" class="mut"></div></div>
+
+<div id="tab-futures" class="tab">
+<div class="card"><h3>바이낸스 선물 <span class="mut">준비 중</span></h3>
+<div class="pl"><i class="dot off"></i><b>단계</b><span>① 읽기 전용 API 연결(잔고·펀딩비·포지션·청산가) → ② 테스트넷 실행기 → ③ 모의 체결 모델(펀딩·마크가격·청산) → ④ 리스크 가드 3종(레버리지·청산가 거리·포지션별 최대 손실액) → ⑤ 격리 소액 실거래</span></div>
+<div class="pl"><i class="dot warn"></i><b>필요</b><span>이사님이 바이낸스에서 <b>읽기 전용</b>(출금 불가·거래 불가) API 키를 발급해 맥 미니 키체인에 등록해야 ①을 시작할 수 있습니다.</span></div>
+<div class="pl"><i class="dot off"></i><b>용도</b><span>헤지(장기 코어 보호, 크로스) · 펀딩 차익(델타 중립, 레버리지 ≤2) · 방향성(격리, 재미 예산 안)</span></div>
+<div class="pl"><i class="dot bad"></i><b>조건</b><span>P0 가드 설치 완료(11/20). R:R 가드가 켜지고 통합 백테스터 재검증이 끝나기 전에는 실거래를 켜지 않습니다.</span></div></div>
+</div>
+
+
+<div id="tab-settings" class="tab">
+<div class="card" id="guardcard"><h3>안전장치 현재값 vs 기본값 <span class="mut" id="guardmeta"></span></h3><div id="guardbody" class="mut">불러오는 중…</div></div>
+<div class="card"><h3>설정 <span class="mut" id="setmeta"></span></h3><div id="setform"></div>
+<div class="row" style="margin-top:10px"><div><button class="ok" id="setsave" style="width:100%">저장</button></div><div><button class="sm warn" id="setreset" style="width:100%">기본값으로 초기화</button></div></div></div>
+<div class="card" id="moneycard"><h3>투입금액 <span class="mut" id="moneyhint"></span></h3>
+<div class="row"><div style="flex:2"><input id="amt" type="number" inputmode="numeric" placeholder="금액(원)" min="1" style="width:100%"></div>
+<div style="flex:1"><button class="ok" id="addbtn" style="width:100%">＋ 추가</button></div><div style="flex:1"><button class="warn" id="subbtn" style="width:100%">－ 빼기</button></div></div>
+<div style="margin-top:6px"><span class="chip" data-a="10000">1만</span><span class="chip" data-a="50000">5만</span><span class="chip" data-a="100000">10만</span><span class="chip" data-a="1000000">100만</span></div>
+<div class="mut" id="moneyinfo"></div></div>
+</div>
+
+
+<div id="tab-log" class="tab gauto">
+<div class="card"><h3>이벤트 기록</h3><div id="evlog" class="mut"></div></div>
 <div class="card"><h3>뉴스/공지 반응</h3><div id="nev" class="mut"></div></div>
-<div class="card"><h3>스타일 설명</h3><div id="styledesc" class="mut"></div></div></div>
+<div class="card"><h3>스타일 설명</h3><div id="styledesc" class="mut"></div></div>
+</div>
 
 <details id="detsec" hidden></details><button id="mdetbtn" hidden></button><div id="mfold" hidden></div>
 <div id="toast"></div>
@@ -813,6 +867,66 @@ function renderSkills(d){if(!d||PG!='coin'||!$('skillbody'))return;const s=d.ski
 {const _render=render;render=function(){document.body.classList.toggle('pg-stock',PG!='coin');_render();if(PG!='coin'&&D){try{renderV16(D)}catch(e){console.log(e)}}for(const fn of [renderAcct,renderGrok,renderSkills]){try{fn(D)}catch(e){console.log(e)}}}}
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{try{if(D){render();renderDD(D)}if(T)renderT()}catch(e){}},60)));
 addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{try{if(D){render();renderDD(D)}}catch(e){}},250)});
+
+/* ===== dash1: 홈 핵심 5 · 안전장치 · 신 주식 모의 · 보고함 ===== */
+const KIND_KO={daily:'일일',event:'특정',weekly:'주간',monthly:'월간',advice:'조언',research:'조사',etc:'기타'};
+let RPF='all';
+function rpRead(){try{return new Set(JSON.parse(localStorage.getItem('rp_read')||'[]'))}catch(e){return new Set()}}
+function rpMark(id){const r=rpRead();r.add(id);try{localStorage.setItem('rp_read',JSON.stringify([...r].slice(-500)))}catch(e){}}
+function rpUnread(){const R=(X&&X.reports&&X.reports.items)||[];const r=rpRead();return R.filter(x=>!r.has(x.id)).length}
+function goTab(t){const b=document.querySelector('nav button[data-t="'+t+'"]');if(b)b.click()}
+function renderHome5(d){if(!d||!$('k_total'))return;const isC=PG=='coin';const a=d.account||{},G=d.guards||{},A3=d.alerts3||{},cf=d.cfg||{},df=d.defaults||{},c=d.control||{};
+ const tot=isC&&a.total?a.total:d.equity;aNum($('k_total'),tot,v=>f(v)+'원');$('k_total_s').textContent=isC?(a.total?'업비트 계좌 전체 · 봇 운용 '+f(d.equity)+'원':'봇 운용 평가 (계좌 집계 대기)'):'가상 자금 (구 엔진)';
+ const tp=d.today_pnl;const kt=$('k_today');kt.textContent=sg(tp)+'원';kt.className=cl(tp);$('k_today_s').textContent='봇 기준 · 00:00 이후';
+ const kc=$('k_cum');kc.textContent=(d.pnl_pct>=0?'+':'')+f(d.pnl_pct,2)+'%';kc.className=cl(d.pnl_pct);{const M=d.metrics||{};const b=M.btc_ret!=null?M.btc_ret:(M.market&&M.market.btc_ret!=null?M.market.btc_ret:null);$('k_cum_s').textContent=sg(d.pnl_krw)+'원'+(b!=null?' · 같은 기간 BTC 보유 '+(b>=0?'+':'')+f(b,2)+'%':' · 원금 '+f(d.capital)+'원')}
+ const pos=d.positions||[];$('k_pos').textContent=pos.length+'개';$('k_pos').className=pos.length?'':'';$('k_pos_s').textContent=pos.length?('노출 '+f(d.exposure_pct,1)+'% · '+pos.map(x=>(x.name||String(x.market||'').replace('KRW-',''))+' '+(x.unreal_pct>0?'+':'')+x.unreal_pct+'%').join(', ')):'현금 대기';
+ const stale=d.status_age_s>120,run=d.running&&d.state!='stopped';const ks=$('k_sys');ks.textContent=!run?'정지':stale?'응답 없음':d.halted?'매수 중지':c.paused?'일시정지':'정상';ks.className=!run||stale?'dn':(d.halted||c.paused)?'warn':'up';
+ $('k_sys_s').textContent='갱신 '+String(d.time||'').slice(5,16)+(isC&&d.grok_mode?' · 그록 맡기기'+(G.shadow?'(그림자)':''):'')+(G.stop_switch?' · STOP':'');
+ const grokRules=(G.grok_rules||[]).join('+');
+ $('k_mode').innerHTML=isC?`<span class="pill ${c.risk=='aggressive'?'r':'c'}">${c.risk=='aggressive'?'🔥 공격적':'🛡 안정적'}</span><span class="pill">${esc(d.style_label||c.style||'')}</span>${d.grok_mode?`<span class="pill r">🤖 그록 맡기기${G.shadow?' · 그림자':''}</span>`:''}<span class="pill">${d.grok_mode?'진입 규칙 '+esc(grokRules):'봇 규칙 진입'}</span><span class="pill ${G.rr_on?'c':''}">R:R 가드 ${G.rr_on?'켬':'꺼짐'}</span>`
+  :`<span class="pill">${esc(d.style_label||c.style||'')}</span><span class="pill">${d.market_open?'장중':'장 마감/대기'}</span><span class="pill">모의 · 실주문 없음</span>`;
+ const al=[];const cnt=A3.counts||{};const act=A3.active||[];
+ if(!run)al.push(['bad','봇 정지','eng']);if(stale)al.push(['bad','봇 응답 없음 '+d.status_age_s+'초','eng']);if(d.halted)al.push(['bad','신규 매수 중지: '+(d.halted.text||''),'home']);if(c.paused)al.push(['warn','신규 매수 일시정지','home']);
+ if(d.risk&&d.risk.daily_hit)al.push(['bad','하루 손실 한도 도달','ana']);act.forEach(x=>al.push(['bad',x,'trades']));
+ if(isC&&cf.reserve_krw!=null&&df.reserve_krw!=null&&cf.reserve_krw<df.reserve_krw)al.push(['warn','보호 원화 '+f(cf.reserve_krw)+'원 (기본 '+f(df.reserve_krw)+'원) — 설정 확인','settings']);
+ if(isC&&!G.rr_on)al.push(['','R:R 가드 꺼짐 (결정 C) — 손절 3%/10% 규칙으로 거래 중','settings']);
+ if(isC&&cnt.urgent)al.push(['bad','긴급 알림 '+cnt.urgent+'건 (24h)','trades']);const ur=rpUnread();if(ur)al.push(['warn','미확인 보고 '+ur+'건','reports']);
+ if(!al.length)al.push(['ok','경보 없음','']);
+ $('k_alerts').innerHTML=al.map(([k,t,tab])=>`<span class="${k}" ${tab?'data-t="'+tab+'"':''}>${esc(t)}</span>`).join('');
+ document.querySelectorAll('#k_alerts span[data-t]').forEach(e=>e.onclick=()=>goTab(e.dataset.t));
+ const rb=$('rpbadge');if(rb)rb.textContent=ur?String(ur):''}
+function renderGuards(d){if(!d||!$('guardbody'))return;const isC=PG=='coin';const cf=d.cfg||{},df=d.defaults||{},G=d.guards||{};
+ const KO={reserve_krw:'보호 원화',cap_krw:'최대 운영금액',goal_krw:'목표금액',goal_pct:'목표수익률 %',goal_action:'목표 도달 시',loss_pct:'손실 한도 %',loss_basis:'손실 기준',loss_action:'손실 도달 시',sl_override_pct:'거래당 손절 % (덮어쓰기)',end_time:'종료 시각'};
+ const AK={notify:'알림만',stop_buy:'신규매수 중지',liquidate_stop:'전량 정리 후 중지',total:'원금 대비',peak:'고점 대비',daily:'하루 기준'};const fv=(k,v)=>v==null?'-':(typeof v=='number'&&!/pct|time/.test(k)?f(v)+'원':(AK[v]||String(v)));
+ let h='<table class="mt gtbl"><tr><th>항목</th><th>현재값</th><th>기본값</th><th></th></tr>';let ndiff=0;
+ for(const k of Object.keys(KO)){if(!(k in df))continue;const cv=cf[k],dv=df[k];const same=String(cv)==String(dv);if(!same)ndiff++;const bad=k=='reserve_krw'&&cv<dv;
+  h+=`<tr><td>${KO[k]}</td><td class="${bad?'bad':same?'':'diff'}">${esc(fv(k,cv))}</td><td class="mut">${esc(fv(k,dv))}</td><td>${bad?'⚠ 보호선 낮음':same?'<span class=ok>=</span>':'변경됨'}</td></tr>`}
+ h+='</table>';
+ if(isC&&!G.error){const R=G.rules||{};h+=`<div class="gnote"><b>P0 가드 (rules_cfg.json)</b> · 파일 갱신 ${G.cfg_age_s!=null?Math.round(G.cfg_age_s/60)+'분 전':'-'}</div><table class="mt gtbl"><tr><th>가드</th><th>현재</th><th>설명</th></tr>`
+  +`<tr><td>R:R 가드</td><td class="${G.rr_on?'ok':'diff'}">${G.rr_on?'켬':'꺼짐'}</td><td class="mut">손절 ≤ 목표수익×${f(G.rr_ratio,3)} 아니면 매수 거절. 켜면 현재 규칙값으로는 전부 거절</td></tr>`
+  +`<tr><td>그록 그림자 모드</td><td>${G.shadow?'켬(기록만)':'꺼짐'}</td><td class="mut">판단만 기록하고 주문 안 함</td></tr>`
+  +`<tr><td>청산 완화 거절</td><td class="ok">켬</td><td class="mut">규칙 기준선보다 느슨한 손절·보유 요청 거절, 규칙 미지정 거절</td></tr>`
+  +`<tr><td>연속 손절 휴식</td><td>${G.streak&&G.streak.on?'켬':'꺼짐'}</td><td class="mut">손절 ${G.streak&&G.streak.n}회/${G.streak&&G.streak.window_h}h → ${G.streak&&G.streak.pause_h}h 매수 중지</td></tr>`
+  +`<tr><td>신규 상장 제외</td><td>${G.newlist&&G.newlist.on?'켬':'꺼짐'}</td><td class="mut">상장 ${G.newlist&&G.newlist.days}일 미만 제외</td></tr>`
+  +`<tr><td>STOP 킬스위치</td><td class="${G.stop_switch?'bad':'ok'}">${G.stop_switch?'켜짐':'없음'}</td><td class="mut">파일 생성 시 매수 차단·청산</td></tr>`
+  +`<tr><td>그록 한도</td><td>${G.grok_max_pos}종 · ${f((G.grok_size_frac||0)*100,0)}%/${f((G.grok_max_frac||0)*100,0)}%</td><td class="mut">동시 보유 · 권장 비중 / 코인당 상한</td></tr></table>`
+  +'<table class="mt gtbl" style="margin-top:6px"><tr><th>규칙</th><th>손절</th><th>목표(tp_ref)</th><th>R:R 허용 손절</th><th>추적 발동</th><th>보유</th></tr>'+Object.entries(R).map(([k,r])=>{const lim=r.tp_ref_pct!=null?r.tp_ref_pct*(G.rr_ratio||0.667):null;const bad=lim!=null&&r.sl_pct>lim;return `<tr><td>${esc(k)}</td><td class="${bad?'bad':''}">${f(r.sl_pct,1)}%</td><td>${r.tp_ref_pct!=null?f(r.tp_ref_pct,2)+'%':'-'}</td><td>${lim!=null?'≤'+f(lim,2)+'%':'-'}</td><td>${r.arm_pct!=null?f(r.arm_pct,1)+'%':'없음'}</td><td>${r.hold_min!=null?r.hold_min+'분':'다음 09:00'}</td></tr>`}).join('')+'</table>';}
+ $('guardbody').innerHTML=h;$('guardmeta').textContent=ndiff?'· 기본값과 다른 항목 '+ndiff+'개':'· 모두 기본값'}
+function renderStockPaper(d){const card=$('spcard');if(!card)return;const isS=PG=='stock';card.style.display=isS?'block':'none';if(!isS||!d)return;const s=d.stock_paper;if(!s||s.error){$('spbody').textContent=s&&s.error?'읽기 실패: '+s.error:'불러오는 중…';return}
+ $('spmeta').textContent='· 갱신 '+String(s.updated||'').slice(5,16)+' · 각 '+f(s.capital_each)+'원 · 합계 '+f(s.total_equity)+'원 ('+(s.total_pct>=0?'+':'')+f(s.total_pct,3)+'%) · KODEX200 보유 '+(s.bench_pct>=0?'+':'')+f(s.bench_pct,2)+'%';
+ $('spbody').innerHTML='<div class="scrollbox" style="overflow-x:auto"><table class="mt"><tr><th>전략</th><th>평가</th><th>수익률</th><th>vs KODEX200</th><th>거래</th><th>보유</th><th>승률</th><th>PF</th><th>기대값</th><th>MDD</th><th>수수료</th></tr>'
+  +(s.strategies||[]).map(x=>`<tr title="${esc(x.name||'')}"><td style="text-align:left">${esc(x.name||x.key)}</td><td>${f(x.equity)}</td><td class="${cl(x.return_pct)}">${(x.return_pct>=0?'+':'')+f(x.return_pct,3)}%</td><td class="${cl(x.vs_bench_pctp)}">${(x.vs_bench_pctp>=0?'+':'')+f(x.vs_bench_pctp,2)}%p</td><td>${x.trades}</td><td>${x.open}${x.positions&&x.positions.length?' <span class=mut>('+x.positions.map(p=>p.code+' '+(p.pnl_pct!=null?(p.pnl_pct>=0?'+':'')+p.pnl_pct+'%':'')).join(', ')+')</span>':''}</td><td>${x.win_rate_pct==null?'-':f(x.win_rate_pct,0)+'%'}</td><td>${x.pf==null?'-':f(x.pf,2)}</td><td>${x.exp_pct==null?'-':(x.exp_pct>=0?'+':'')+f(x.exp_pct,2)+'%'}</td><td class="dn">${x.mdd_pct==null?'-':f(x.mdd_pct,2)+'%'}</td><td>${f(x.fees)}</td></tr>`).join('')
+  +'</table></div><div class="mut" style="margin-top:4px">통계 판정은 느린 전략 기준 20건·21일 이상 쌓인 뒤. 지금은 표본 수집 중.</div>'}
+function renderReports(x){const el=$('rplist');if(!el)return;const R=(x&&x.reports)||{};const items=R.items||[];const rd=rpRead();
+ const kinds=R.kinds||{};$('rpchips').innerHTML=[['all','전체 '+items.length],['unread','미확인 '+items.filter(i=>!rd.has(i.id)).length]].concat(Object.entries(kinds).map(([k,n])=>[k,(KIND_KO[k]||k)+' '+n])).map(([k,v])=>`<span class="chip ${RPF==k?'on':''}" data-k="${k}">${esc(v)}</span>`).join('');
+ document.querySelectorAll('#rpchips .chip').forEach(c=>c.onclick=()=>{RPF=c.dataset.k;renderReports(X)});
+ const it=items.filter(i=>RPF=='all'||(RPF=='unread'&&!rd.has(i.id))||i.kind==RPF);
+ $('rpmeta').textContent=items.length?'· '+items.length+'건 · 최근 '+String(items[0].t||'').slice(0,16):'';
+ el.innerHTML=it.length?it.map(i=>`<div class="rp ${rd.has(i.id)?'':'unread'} ${i.level=='urgent'?'urgent':i.level=='warn'?'warn':''}" data-id="${esc(i.id)}"><div class="rh"><span class="rk">${esc(KIND_KO[i.kind]||i.kind||'')}</span><b>${esc(i.title||'')}</b><time>${esc(String(i.t||'').slice(0,16))}</time></div><div class="rs">${esc(i.summary||'')}</div><div class="rb">${esc(i.body||'')}${(i.actions||[]).length?'\n\n권고: '+i.actions.map(a=>esc(a.label||'')).join(' · '):''}</div><div class="rf">${esc(i.source||i.model||'')}${i.model?' · 작성 모델 '+esc(i.model):''}</div></div>`).join(''):'<div class="mut">해당 보고가 없습니다.</div>';
+ document.querySelectorAll('#rplist .rp .rh').forEach(h=>h.onclick=()=>{const p=h.parentElement;p.classList.toggle('open');if(p.classList.contains('unread')){p.classList.remove('unread');rpMark(p.dataset.id);if(D)renderHome5(D);renderReports(X)}});
+ const rb=$('rpbadge');if(rb){const ur=items.filter(i=>!rd.has(i.id)).length;rb.textContent=ur?String(ur):''}}
+{const _r1=render;render=function(){_r1();for(const fn of [renderHome5,renderGuards,renderStockPaper]){try{fn(D)}catch(e){console.log(e)}}}}
+{const _x1=renderX;renderX=function(){_x1();try{renderReports(X)}catch(e){console.log(e)}if(D){try{renderHome5(D)}catch(e){}}}}
 
 load();loadT();loadX();setInterval(load,10000);setInterval(loadT,5000);setInterval(loadX,30000);
 </script></body></html>
