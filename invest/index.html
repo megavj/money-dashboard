@@ -1,0 +1,116 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><title>투자 현황</title>
+<script src="supabase.js"></script>
+<style>
+:root{--bg:#0b0f17;--card:#141a26;--line:#243047;--tx:#dfe7f5;--mut:#8796b0;--up:#ff5a6a;--dn:#3b8cff;--ok:#2fbf71;--warn:#f0a500}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;padding:12px 12px 40px;max-width:900px;margin:auto}
+h1{font-size:18px;margin:4px 0 10px;display:flex;justify-content:space-between;align-items:baseline}h1 small{color:var(--mut);font-size:12px;font-weight:400}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.card h2{font-size:14px;color:var(--mut);margin:0 0 8px;font-weight:600}
+.big{font-size:28px;font-weight:700}.mut{color:var(--mut);font-size:13px}.up{color:var(--up)}.dn{color:var(--dn)}
+.row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid #1c2436}.row:first-of-type{border-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.kv{background:#0f1420;border-radius:8px;padding:8px}.kv b{display:block;font-size:17px;margin-top:2px}
+.bar{height:8px;border-radius:4px;background:#0f1420;overflow:hidden;display:flex;margin-top:8px}.bar i{display:block;height:100%}
+.tag{display:inline-block;padding:1px 7px;border-radius:9px;font-size:12px;background:#1c2436}.tag.ok{background:#173a28;color:#7fe0a8}.tag.warn{background:#3d3010;color:#ffcf66}.tag.bad{background:#3e1820;color:#ff9aa5}
+#stale{display:none;background:#b3263a;color:#fff;text-align:center;font-size:13px;padding:4px;border-radius:8px;margin-bottom:8px}
+#gate{position:fixed;inset:0;background:rgba(5,8,14,.97);display:flex;align-items:center;justify-content:center;z-index:9}
+#gate .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;width:min(92vw,380px)}
+#gate input,#gate button{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1420;color:var(--tx);font-size:15px;margin-top:8px}
+#gate button{background:#1f6feb;border:0;color:#fff}
+a{color:#7fb0ff}
+</style></head><body>
+<div id="gate"><div class="box"><b style="font-size:17px">🔒 투자 현황 로그인</b>
+ <div id="g_login"><div class="mut" style="margin:6px 0">등록된 이메일로 받은 인증번호를 입력하세요.</div>
+  <input id="g_em" type="email" placeholder="이메일" autocomplete="email"><button id="g_send" style="background:#1c2436">인증 메일 받기</button>
+  <input id="g_code" inputmode="numeric" placeholder="인증번호" autocomplete="one-time-code"><button id="g_ok">로그인</button></div>
+ <div id="g_pass" style="display:none"><div class="mut" style="margin:6px 0">잠금 비밀문구를 입력하세요. (맥미니 키체인에 저장한 것과 같은 문구)</div>
+  <input id="g_pw" type="password" placeholder="비밀문구" autocomplete="current-password"><label class="mut" style="display:block;margin-top:8px"><input id="g_rem" type="checkbox" checked style="width:auto"> 이 기기에서 기억</label><button id="g_unlock">열기</button></div>
+ <div id="g_msg" class="mut" style="margin-top:8px"></div></div></div>
+
+<h1>💼 투자 현황 <small id="ts"></small></h1>
+<div id="stale"></div>
+<div id="app" class="mut">불러오는 중…</div>
+
+<script>
+const SB=supabase.createClient("https://ztypllzgjivutzorhayz.supabase.co","sb_publishable_2oRYJ0sJcdPGBr3SK_XH0Q_SuA_yvHX",
+ {auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"money-dash-auth"}});
+const $=i=>document.getElementById(i);
+const W=n=>n==null?'-':Math.round(n).toLocaleString('ko-KR');
+const EOK=n=>{if(n==null)return'-';const a=Math.abs(n);return (n<0?'-':'')+(a>=1e8?(a/1e8).toFixed(2)+'억':(a/1e4).toLocaleString('ko-KR',{maximumFractionDigits:0})+'만')};
+const PC=(x,d=1)=>x==null?'-':(x>0?'+':'')+Number(x).toFixed(d)+'%';
+const cls=x=>x>0?'up':x<0?'dn':'';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let PW=localStorage.getItem('invest-pw')||sessionStorage.getItem('invest-pw');
+
+async function gunzip(b64){const b=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));return await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}
+const ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let keyCache={};
+async function decrypt(env,pw){
+ const ck=env.salt+pw; let key=keyCache[ck];
+ if(!key){const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:ub(env.salt),iterations:env.iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);keyCache={[ck]:key}}
+ const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(env.iv)},key,ub(env.ct));
+ return JSON.parse(new TextDecoder().decode(pt))}
+
+async function load(){
+ let {data,error}=await SB.from('dash_blob').select('gz,updated_at').eq('key','invest').maybeSingle();
+ if(error&&/JWT|auth|token/i.test(error.message)){await SB.auth.refreshSession();({data,error}=await SB.from('dash_blob').select('gz,updated_at').eq('key','invest').maybeSingle())}
+ if(error){$('app').textContent='불러오기 실패: '+error.message;return}
+ if(!data){$('app').textContent='아직 데이터가 없습니다.';return}
+ const age=(Date.now()-new Date(data.updated_at))/1000;
+ $('stale').style.display=age>180?'block':'none';$('stale').textContent='⚠ 맥미니 연결 끊김 — '+Math.round(age/60)+'분 전 자료';
+ const env=JSON.parse(await gunzip(data.gz));
+ let d;try{d=await decrypt(env,PW)}catch(e){localStorage.removeItem('invest-pw');sessionStorage.removeItem('invest-pw');PW=null;showPass('비밀문구가 맞지 않습니다.');return}
+ render(d)}
+
+function render(d){
+ $('ts').textContent=d.t+' KST';
+ const A=d.accounts,B=d.buckets,diff=d.prev_total?d.total-d.prev_total:null;
+ let h='';
+ h+=`<div class="card"><h2>총자산 (3개 계좌)</h2><div class="big">${W(d.total)}원</div>
+ <div class="mut">어제 대비 <span class="${cls(diff)}">${diff==null?'기록 시작':(diff>0?'+':'')+W(diff)+'원 ('+PC(diff/d.prev_total*100,2)+')'}</span> · 1 USDT = ${W(d.fx)}원</div>
+ <div class="grid" style="margin-top:10px">
+  <div class="kv">한국투자증권<b>${EOK(A.kis.total)}</b><span class="mut">예수금 ${W(A.kis.cash)}</span>${A.kis.err?'<div class="up">조회 오류</div>':''}</div>
+  <div class="kv">업비트<b>${EOK(A.upbit.total)}</b><span class="mut">${(A.upbit.coins||[]).length?'코인 '+A.upbit.coins.length+'종':'현금 대기'}</span>${A.upbit.err?'<div class="up">조회 오류</div>':''}</div>
+  <div class="kv">바이낸스 선물<b>${(A.binance.usdt??0).toFixed(1)} USDT</b><span class="mut">≈ ${EOK(A.binance.krw)} · 포지션 ${(A.binance.positions||[]).length}</span>${A.binance.err?'<div class="up">조회 오류</div>':''}</div>
+ </div></div>`;
+ const tot=d.total||1,lp=B.long.value/tot*100,sp=B.short.value/tot*100,cp=Math.max(0,100-lp-sp);
+ const lpl=B.long.value-B.long.cost;
+ h+=`<div class="card"><h2>바구니</h2>
+ <div class="row"><span>🏦 장기 (삼성전자·SK하이닉스)</span><span>${EOK(B.long.value)} <span class="${cls(lpl)}">${(lpl>0?'+':'')+EOK(lpl)} (${PC(lpl/B.long.cost*100)})</span></span></div>
+ <div class="row"><span>⚡ 단기 (코인 봇)</span><span>${EOK(B.short.value)}</span></div>
+ <div class="row"><span>💵 증권 예수금</span><span>${EOK(B.cash_other)}</span></div>
+ <div class="bar"><i style="width:${lp}%;background:#1f6feb"></i><i style="width:${sp}%;background:#f0a500"></i><i style="width:${cp}%;background:#2fbf71"></i></div>
+ <div class="mut" style="margin-top:6px">목표 금액·비율: ${B.long.target||B.short.target?'장기 '+EOK(B.long.target)+' / 단기 '+EOK(B.short.target):'미정 (이사님 결정 대기)'}</div></div>`;
+ h+=`<div class="card"><h2>보유 종목</h2>`+(d.holdings||[]).map(x=>`<div class="row"><span><b>${esc(x.name)}</b> <span class="mut">${W(x.qty)}주</span><br><span class="mut">평단 ${W(x.avg)} → 현재 ${W(x.px)}</span></span><span style="text-align:right">${EOK(x.value)}<br><span class="${cls(x.pnl_pct)}">${PC(x.pnl_pct)} (${EOK((x.px-x.avg)*x.qty)})</span></span></div>`).join('')+`</div>`;
+ const F=d.flows||{},nm={'005930':'삼성전자','000660':'SK하이닉스'};
+ h+=`<div class="card"><h2>외국인·기관 순매수 (억원)</h2>`+Object.keys(F).map(c=>{const f=F[c];return `<div class="row"><span><b>${nm[c]||c}</b> <span class="mut">${f.date.slice(4,6)}/${f.date.slice(6)}</span><br><span class="mut">외국인 ${f.streak>0?f.streak+'일 연속 순매수':(-f.streak)+'일 연속 순매도'}</span></span><span style="text-align:right">외국인 1일 <span class="${cls(f.f1)}">${W(f.f1)}</span> · 5일 <span class="${cls(f.f5)}">${W(f.f5)}</span><br><span class="mut">20일 ${W(f.f20)} · 기관5일 ${W(f.i5)} · 개인5일 ${W(f.p5)}</span></span></div>`}).join('')+`</div>`;
+ h+=`<div class="card"><h2>금리·환율</h2>`+(d.macro||[]).map(l=>`<div class="row"><span>${esc(l.split(':')[0])}</span><span>${esc(l.split(':').slice(1).join(':'))}</span></div>`).join('')+`</div>`;
+ const T=d.thesis;if(T){const lab=['AI 투자→HBM 수요','메모리 가격 강세','이익 성장','저평가(PBR)','주주환원'];
+  const tg=s=>`<span class="tag ${/깨짐/.test(s)?'bad':/약|주의|하향/.test(s)?'warn':'ok'}">${esc(s)}</span>`;
+  h+=`<div class="card"><h2>투자 근거 점검 (${esc(T.date)})</h2>`+T.basis.map((s,i)=>`<div class="row"><span>${lab[i]}</span>${tg(s)}</div>`).join('')+`<div class="row"><span>경고 신호</span><span class="mut" style="text-align:right">${esc(T.warn)}</span></div><div class="mut" style="margin-top:6px">${esc(T.line)}</div></div>`}
+ h+=`<div class="card"><h2>다가오는 일정</h2>`+(d.catalysts||[]).map(c=>`<div class="row"><span style="white-space:nowrap">${c.date.slice(5).replace('-','/')}</span><span style="text-align:right">${esc(c.event)}<br><span class="mut">${esc(c.why)}</span></span></div>`).join('')+`</div>`;
+ const bt=d.bots||{},u=bt.upbit||{},b=bt.binance||{};
+ h+=`<div class="card"><h2>코인 봇 (자동 실행 중)</h2>
+ <div class="row"><span>업비트 ${u.running?'<span class="tag ok">가동</span>':'<span class="tag bad">정지</span>'}<br><span class="mut">${esc(u.style)} · 보유 ${u.positions}개 · 왕복 ${u.trades}회</span></span><span class="${cls(u.pnl_pct)}" style="text-align:right">${PC(u.pnl_pct,2)}<br>${W(u.pnl_krw)}원</span></div>
+ <div class="row"><span>바이낸스 선물 ${b.running?'<span class="tag ok">가동</span>':'<span class="tag bad">정지</span>'}<br><span class="mut">포지션 ${b.positions}개 · 거래 ${b.trades}회</span></span><span class="${cls(b.pnl_pct)}" style="text-align:right">${PC(b.pnl_pct,2)}<br>${(b.equity??0).toFixed(1)} USDT</span></div>
+ <div class="mut" style="margin-top:6px">봇 세부 조작: <a href="../money/">기존 코인 대시보드</a></div></div>`;
+ h+=`<div class="card"><h2>최근 주문 (투자 데스크)</h2>`+((d.orders||[]).length?d.orders.map(o=>`<div class="row"><span class="mut">${esc(o.t)}</span><span>${esc(o.venue)} ${esc(o.cmd)} ${esc(o.sym)} ${o.krw?W(o.krw)+'원':o.qty||o.vol||''}</span></div>`).join(''):'<div class="mut">아직 없음</div>')+`</div>`;
+ h+=`<div class="mut" style="text-align:center">조회 전용 화면 · 1분마다 갱신 · <a href="#" id="lock">잠그기</a></div>`;
+ $('app').innerHTML=h;$('app').classList.remove('mut');
+ $('lock').onclick=e=>{e.preventDefault();localStorage.removeItem('invest-pw');sessionStorage.removeItem('invest-pw');location.reload()}}
+
+function showPass(msg){$('gate').style.display='flex';$('g_login').style.display='none';$('g_pass').style.display='block';$('g_msg').textContent=msg||''}
+let timer;function start(){$('gate').style.display='none';load();clearInterval(timer);timer=setInterval(load,60000)}
+async function boot(){const {data}=await SB.auth.getSession();
+ if(!data.session){$('gate').style.display='flex';return}
+ if(!PW){showPass();return}start()}
+$('g_send').onclick=async()=>{const e=$('g_em').value.trim().toLowerCase();if(!e)return;
+ const {error}=await SB.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});$('g_msg').textContent=error?'보내지 못함: '+error.message:'인증 메일을 보냈습니다.'};
+$('g_ok').onclick=async()=>{const {error}=await SB.auth.verifyOtp({email:$('g_em').value.trim().toLowerCase(),token:$('g_code').value.trim(),type:'email'});
+ if(error){$('g_msg').textContent='인증 실패: '+error.message;return}boot()};
+$('g_unlock').onclick=()=>{PW=$('g_pw').value;if(!PW)return;($('g_rem').checked?localStorage:sessionStorage).setItem('invest-pw',PW);start()};
+$('g_pw').onkeydown=e=>{if(e.key==='Enter')$('g_unlock').click()};
+boot();
+</script></body></html>
