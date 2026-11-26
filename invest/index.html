@@ -53,7 +53,7 @@ async function decrypt(env,pw){
  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(env.iv)},key,ub(env.ct));
  return JSON.parse(new TextDecoder().decode(pt))}
 
-const KEYS=['invest','data:invest','terminal:invest','extra:invest'];
+const KEYS=['data:stock'];
 async function fetchBlob(){let last={data:null,error:null};
  for(const k of KEYS){let r=await SB.from('dash_blob').select('gz,updated_at').eq('key',k).maybeSingle();
   if(r.error&&/JWT|auth|token/i.test(r.error.message)){await SB.auth.refreshSession();r=await SB.from('dash_blob').select('gz,updated_at').eq('key',k).maybeSingle()}
