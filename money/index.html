@@ -1,7 +1,6 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow"><title>투자 현황</title>
-<script src="supabase.js"></script>
 <style>
 :root{--bg:#0b0f17;--card:#141a26;--line:#243047;--tx:#dfe7f5;--mut:#8796b0;--up:#ff5a6a;--dn:#3b8cff;--ok:#2fbf71;--warn:#f0a500}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;padding:12px 12px 40px;max-width:900px;margin:auto}
@@ -20,11 +19,8 @@ h1{font-size:18px;margin:4px 0 10px;display:flex;justify-content:space-between;a
 #gate button{background:#1f6feb;border:0;color:#fff}
 a{color:#7fb0ff}
 </style></head><body>
-<div id="gate"><div class="box"><b style="font-size:17px">🔒 투자 현황 로그인</b>
- <div id="g_login"><div class="mut" style="margin:6px 0">등록된 이메일로 받은 인증번호를 입력하세요.</div>
-  <input id="g_em" type="email" placeholder="이메일" autocomplete="email"><button id="g_send" style="background:#1c2436">인증 메일 받기</button>
-  <input id="g_code" inputmode="numeric" placeholder="인증번호" autocomplete="one-time-code"><button id="g_ok">로그인</button></div>
- <div id="g_pass" style="display:none"><div class="mut" style="margin:6px 0">잠금 비밀문구를 입력하세요. (맥미니 키체인에 저장한 것과 같은 문구)</div>
+<div id="gate"><div class="box"><b style="font-size:17px">🔒 투자 현황</b>
+ <div id="g_pass"><div class="mut" style="margin:6px 0">비밀문구를 입력하세요.</div>
   <input id="g_pw" type="password" placeholder="비밀문구" autocomplete="current-password"><label class="mut" style="display:block;margin-top:8px"><input id="g_rem" type="checkbox" checked style="width:auto"> 이 기기에서 기억</label><button id="g_unlock">열기</button></div>
  <div id="g_msg" class="mut" style="margin-top:8px"></div></div></div>
 
@@ -33,8 +29,6 @@ a{color:#7fb0ff}
 <div id="app" class="mut">불러오는 중…</div>
 
 <script>
-const SB=supabase.createClient("https://ztypllzgjivutzorhayz.supabase.co","sb_publishable_2oRYJ0sJcdPGBr3SK_XH0Q_SuA_yvHX",
- {auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"money-dash-auth"}});
 const $=i=>document.getElementById(i);
 const W=n=>n==null?'-':Math.round(n).toLocaleString('ko-KR');
 const EOK=n=>{if(n==null)return'-';const a=Math.abs(n);return (n<0?'-':'')+(a>=1e8?(a/1e8).toFixed(2)+'억':(a/1e4).toLocaleString('ko-KR',{maximumFractionDigits:0})+'만')};
@@ -53,21 +47,11 @@ async function decrypt(env,pw){
  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(env.iv)},key,ub(env.ct));
  return JSON.parse(new TextDecoder().decode(pt))}
 
-const KEYS=['data:coin'];
-async function fetchBlob(){let last={data:null,error:null};
- for(const k of KEYS){let r=await SB.from('dash_blob').select('gz,updated_at').eq('key',k).maybeSingle();
-  if(r.error&&/JWT|auth|token/i.test(r.error.message)){await SB.auth.refreshSession();r=await SB.from('dash_blob').select('gz,updated_at').eq('key',k).maybeSingle()}
-  if(r.data){window.__key=k;return r}last=r}
- return last}
 async function load(){
- let {data,error}=await fetchBlob();
- if(error){$('app').textContent='불러오기 실패: '+error.message;return}
- if(!data){$('app').textContent='아직 데이터가 없습니다.';return}
- const age=(Date.now()-new Date(data.updated_at))/1000;
- $('stale').style.display=age>180?'block':'none';$('stale').textContent='⚠ 맥미니 연결 끊김 — '+Math.round(age/60)+'분 전 자료';
- const env=JSON.parse(await gunzip(data.gz));
+ let env;try{const r=await fetch('d.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error(r.status);env=await r.json()}catch(e){$('app').textContent='불러오기 실패: '+e.message;return}
  let d;try{d=await decrypt(env,PW)}catch(e){localStorage.removeItem('invest-pw');sessionStorage.removeItem('invest-pw');PW=null;showPass('비밀문구가 맞지 않습니다.');return}
- render(d)}
+ render(d);const age=(Date.now()-new Date(d.t.replace(' ','T')+'+09:00'))/1000;
+ $('stale').style.display=age>1500?'block':'none';$('stale').textContent='⚠ 맥미니 연결 끊김 — '+Math.round(age/60)+'분 전 자료'}
 
 function render(d){
  $('ts').textContent=d.t+' KST';
@@ -102,19 +86,13 @@ function render(d){
  <div class="row"><span>바이낸스 선물 ${b.running?'<span class="tag ok">가동</span>':'<span class="tag bad">정지</span>'}<br><span class="mut">포지션 ${b.positions}개 · 거래 ${b.trades}회</span></span><span class="${cls(b.pnl_pct)}" style="text-align:right">${PC(b.pnl_pct,2)}<br>${(b.equity??0).toFixed(1)} USDT</span></div>
  <div class="mut" style="margin-top:6px">봇 세부 조작: 세부 조작은 텔레그램으로 워렌버핏에게</div></div>`;
  h+=`<div class="card"><h2>최근 주문 (투자 데스크)</h2>`+((d.orders||[]).length?d.orders.map(o=>`<div class="row"><span class="mut">${esc(o.t)}</span><span>${esc(o.venue)} ${esc(o.cmd)} ${esc(o.sym)} ${o.krw?W(o.krw)+'원':o.qty||o.vol||''}</span></div>`).join(''):'<div class="mut">아직 없음</div>')+`</div>`;
- h+=`<div class="mut" style="text-align:center">조회 전용 화면 · 1분마다 갱신 · <a href="#" id="lock">잠그기</a></div>`;
+ h+=`<div class="mut" style="text-align:center">조회 전용 화면 · 10분마다 갱신 · <a href="#" id="lock">잠그기</a></div>`;
  $('app').innerHTML=h;$('app').classList.remove('mut');
  $('lock').onclick=e=>{e.preventDefault();localStorage.removeItem('invest-pw');sessionStorage.removeItem('invest-pw');location.reload()}}
 
-function showPass(msg){$('gate').style.display='flex';$('g_login').style.display='none';$('g_pass').style.display='block';$('g_msg').textContent=msg||''}
-let timer;function start(){$('gate').style.display='none';load();clearInterval(timer);timer=setInterval(load,60000)}
-async function boot(){const {data}=await SB.auth.getSession();
- if(!data.session){$('gate').style.display='flex';return}
- if(!PW){showPass();return}start()}
-$('g_send').onclick=async()=>{const e=$('g_em').value.trim().toLowerCase();if(!e)return;
- const {error}=await SB.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});$('g_msg').textContent=error?'보내지 못함: '+error.message:'인증 메일을 보냈습니다.'};
-$('g_ok').onclick=async()=>{const {error}=await SB.auth.verifyOtp({email:$('g_em').value.trim().toLowerCase(),token:$('g_code').value.trim(),type:'email'});
- if(error){$('g_msg').textContent='인증 실패: '+error.message;return}boot()};
+function showPass(msg){$('gate').style.display='flex';$('g_msg').textContent=msg||'';setTimeout(()=>$('g_pw').focus(),50)}
+let timer;function start(){$('gate').style.display='none';load();clearInterval(timer);timer=setInterval(load,120000)}
+function boot(){if(!PW){showPass();return}start()}
 $('g_unlock').onclick=()=>{PW=$('g_pw').value;if(!PW)return;($('g_rem').checked?localStorage:sessionStorage).setItem('invest-pw',PW);start()};
 $('g_pw').onkeydown=e=>{if(e.key==='Enter')$('g_unlock').click()};
 boot();
