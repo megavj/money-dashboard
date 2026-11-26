@@ -53,9 +53,14 @@ async function decrypt(env,pw){
  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(env.iv)},key,ub(env.ct));
  return JSON.parse(new TextDecoder().decode(pt))}
 
+const KEYS=['invest','data:invest','terminal:invest','extra:invest'];
+async function fetchBlob(){let last={data:null,error:null};
+ for(const k of KEYS){let r=await SB.from('dash_blob').select('gz,updated_at').eq('key',k).maybeSingle();
+  if(r.error&&/JWT|auth|token/i.test(r.error.message)){await SB.auth.refreshSession();r=await SB.from('dash_blob').select('gz,updated_at').eq('key',k).maybeSingle()}
+  if(r.data){window.__key=k;return r}last=r}
+ return last}
 async function load(){
- let {data,error}=await SB.from('dash_blob').select('gz,updated_at').eq('key','invest').maybeSingle();
- if(error&&/JWT|auth|token/i.test(error.message)){await SB.auth.refreshSession();({data,error}=await SB.from('dash_blob').select('gz,updated_at').eq('key','invest').maybeSingle())}
+ let {data,error}=await fetchBlob();
  if(error){$('app').textContent='불러오기 실패: '+error.message;return}
  if(!data){$('app').textContent='아직 데이터가 없습니다.';return}
  const age=(Date.now()-new Date(data.updated_at))/1000;
